@@ -20,7 +20,7 @@ public class TestFile {
 
 		// 检验指定路径下是否存在指定的目录或者文件.
 		System.out.println(file.exists());
-		// File对象是否是目录
+		// File对象是否是目录，目录不存在也是false
 		System.out.println(file.isDirectory());
 		// 对象是否是文件
 		System.out.println(file.isFile());
