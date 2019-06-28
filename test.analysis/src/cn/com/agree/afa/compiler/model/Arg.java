@@ -10,6 +10,8 @@ public class Arg {
 	private int logLevel = 4;
 	private String value = "";
 	private String type = "";
+	private String name = "";
+	private String arg = "";
 
 	public Arg copy() {
 		Arg arg = new Arg();
@@ -20,6 +22,27 @@ public class Arg {
 		arg.type = this.type;
 		return arg;
 	}
+
+	
+	public String getName() {
+		return name;
+	}
+
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+
+	public String getArg() {
+		return arg;
+	}
+
+
+	public void setArg(String arg) {
+		this.arg = arg;
+	}
+
 
 	public String getKey() {
 		return this.key;

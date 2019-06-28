@@ -11,7 +11,7 @@ public class StepModel {
 	private String parentTradeName;
 	private String simpleParentName;
 	private boolean isNoop;
-	private Map<Integer, Integer> stepRelations = new TreeMap<>();
+	private Map<String, Integer> stepRelations = new TreeMap<>();
 	public static final String DEFAULT_STRING = "";
 	private InfoLogContext logContext = new InfoLogContext();
 
@@ -49,10 +49,10 @@ public class StepModel {
 
 	public void addNextStepId(int status, int nextStepId) {
 		if (nextStepId > 0)
-			this.stepRelations.put(Integer.valueOf(status), Integer.valueOf(nextStepId));
+			this.stepRelations.put(String.valueOf(status), Integer.valueOf(nextStepId));
 	}
 
-	public Map<Integer, Integer> getStepRelations() {
+	public Map<String, Integer> getStepRelations() {
 		return this.stepRelations;
 	}
 

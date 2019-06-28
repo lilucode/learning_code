@@ -6,9 +6,10 @@ import java.util.TreeMap;
 
 public class NodeModel implements Comparable<NodeModel> {
 	private int id;
-	private String desc;
-	private int type;
-	private String cptName;
+	private String idString;		//Component/Implementation/Node/Id
+	private String desc;			//Component/Implementation/Node/Desp
+	private int type;				//Component/Implementation/Node/Type
+	private String cptName;			//Component/Implementation/Node/Target
 	private boolean async;
 	private int value;
 	private int checkTradeExist = ExitType.DEFAULT_ERROR;
@@ -18,8 +19,15 @@ public class NodeModel implements Comparable<NodeModel> {
 	private DebugInfo debugInfo;
 	private List<Arg> inputArgs;
 	private List<Arg> outputArgs;
-	private String aspectUsed;
-	private Map<Integer, Integer> nodeRelations = new TreeMap<>();
+	private String aspectUsed;		
+	private String targetNodeId;	//Component/Implementation/Node/SourceConnections/Connection/targetId
+	private String terminalDesc;	//Component/Implementation/Node/Terminals/Terminal/Desp
+	private String terminalName;	//Component/Implementation/Node/Terminals/Terminal/Name
+	private String endId;			//Component/Implementation/Node/Id
+	private String targetId;		// Component/Implementation/Node/SourceConnections/Connection/targetId
+	private String location;		//Component/Implementation/Node/Constraint/Location
+	private String size;			//Component/Implementation/Node/Constraint/Size
+	private Map<String, Integer> nodeRelations = new TreeMap<>();
 	public static final String DEFAULT_BEGIN_DESC = "开始";
 	public static final String DEFAULT_BEGIN_CPTNAME = "Begin";
 	public static final String DEFAULT_NORMAL_END_DESC = "正常结束";
@@ -33,6 +41,62 @@ public class NodeModel implements Comparable<NodeModel> {
 		}
 		return this.id == o.id ? 0 : -1;
 	}
+	
+	public String getTargetNodeId() {
+		return targetNodeId;
+	}
+
+	public void setTargetNodeId(String targetNodeId) {
+		this.targetNodeId = targetNodeId;
+	}
+
+	public String getTerminalDesc() {
+		return terminalDesc;
+	}
+
+	public void setTerminalDesc(String terminalDesc) {
+		this.terminalDesc = terminalDesc;
+	}
+
+	public String getTerminalName() {
+		return terminalName;
+	}
+
+	public void setTerminalName(String terminalName) {
+		this.terminalName = terminalName;
+	}
+
+	public String getEndId() {
+		return endId;
+	}
+
+	public void setEndId(String endId) {
+		this.endId = endId;
+	}
+
+	public String getTargetId() {
+		return targetId;
+	}
+
+	public void setTargetId(String targetId) {
+		this.targetId = targetId;
+	}
+
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
+	}
+
+	public String getSize() {
+		return size;
+	}
+
+	public void setSize(String size) {
+		this.size = size;
+	}
 
 	public int getId() {
 		return this.id;
@@ -40,6 +104,14 @@ public class NodeModel implements Comparable<NodeModel> {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public String getIdString() {
+		return idString;
+	}
+
+	public void setIdString(String idString) {
+		this.idString = idString;
 	}
 
 	public String getDesc() {
@@ -132,15 +204,15 @@ public class NodeModel implements Comparable<NodeModel> {
 
 	public void addNextNodeId(int status, int nextNodeId) {
 		if (nextNodeId > 0)
-			this.nodeRelations.put(Integer.valueOf(status), Integer.valueOf(nextNodeId));
+			this.nodeRelations.put(String.valueOf(status), Integer.valueOf(nextNodeId));
 	}
 
 	public int getNextNodeId(int status) {
-		Integer nextNodeId = (Integer) this.nodeRelations.get(Integer.valueOf(status));
+		Integer nextNodeId = (Integer) this.nodeRelations.get(String.valueOf(status));
 		return nextNodeId != null ? nextNodeId.intValue() : 0;
 	}
 
-	public Map<Integer, Integer> getNodeRelations() {
+	public Map<String, Integer> getNodeRelations() {
 		return this.nodeRelations;
 	}
 

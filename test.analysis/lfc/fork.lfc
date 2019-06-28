@@ -1,0 +1,414 @@
+{
+  "start": "7",
+  "caption": "111",
+  "geometry": {
+    "x": 346,
+    "y": 20,
+    "width": 80,
+    "height": 80
+  },
+  "fileDescription": {
+    "author": "li",
+    "function": "fork功能",
+    "remark": "fork"
+  },
+  "dataBasket": {
+    "ade": []
+  },
+  "inArgs": {
+    "arg": [
+      {
+        "name": "inValue1",
+        "type": "String",
+        "description": "lfc入参1",
+        "example": "",
+        "value": ""
+      },
+      {
+        "name": "inValue2",
+        "type": "String",
+        "description": "lfc入参2",
+        "example": "",
+        "value": ""
+      }
+    ]
+  },
+  "outArgs": {
+    "arg": [
+      {
+        "name": "outValue1",
+        "type": "String",
+        "description": "lfc出参1",
+        "example": "",
+        "value": ""
+      },
+      {
+        "name": "outValue2",
+        "type": "String",
+        "description": "lfc出参2",
+        "example": "",
+        "value": ""
+      }
+    ]
+  },
+  "internalVars": {
+    "arg": [
+      {
+        "name": "inValue",
+        "type": "String",
+        "description": "lfc内部变量",
+        "value": ""
+      }
+    ]
+  },
+  "endstep": {
+    "id": "1000",
+    "geometry": {
+      "x": 344,
+      "y": 660,
+      "width": 120,
+      "height": 40
+    },
+    "in": [
+      {
+        "caption": "正常出口1001",
+        "name": "正常出口2001",
+        "id": "1"
+      }
+    ]
+  },
+  "end": [
+    {
+      "caption": "正常出口1001",
+      "name": "正常出口2001",
+      "id": "1001"
+    }
+  ],
+  "lfc": [
+    {
+      "id": "10",
+      "caption": "LFC",
+      "name": "LFC",
+      "showId": "3",
+      "geometry": {
+        "x": 284,
+        "y": 310,
+        "width": 180,
+        "height": 40
+      },
+      "runType": "sync",
+      "timeout": 0,
+      "out": [
+        {
+          "caption": "正常出口",
+          "name": "正常出口",
+          "id": "1",
+          "next": "12"
+        }
+      ],
+      "inArgs": {
+        "arg": [
+          {
+            "name": "str",
+            "type": "String",
+            "description": "12",
+            "example": "",
+            "value": "\"123\""
+          }
+        ]
+      },
+      "outArgs": {
+        "arg": [
+          {
+            "name": "lfc1",
+            "type": "String",
+            "description": "",
+            "example": "",
+            "value": ""
+          }
+        ]
+      },
+      "mappingPath": "/demo-s/business/fork.lfc",
+      "mappings": [],
+      "ades": [],
+      "lfcPath": "/demo-s/business/test1.1.lfc",
+      "fileDescription": {
+        "author": "",
+        "function": "",
+        "remark": ""
+      },
+      "exception": {
+        "name": "",
+        "next": "8"
+      }
+    }
+  ],
+  "csd": [
+    {
+      "id": "12",
+      "caption": "Server2",
+      "name": "CSD",
+      "showId": "4",
+      "geometry": {
+        "x": 120,
+        "y": 400,
+        "width": 180,
+        "height": 40
+      },
+      "csdUrl": "",
+      "urlPattern": "",
+      "method": "",
+      "header": {},
+      "response": "",
+      "body": {},
+      "out": [
+        {
+          "caption": "成功",
+          "name": "success",
+          "id": "1",
+          "next": "8"
+        }
+      ],
+      "exception": {
+        "name": "",
+        "next": ""
+      }
+    }
+  ],
+  "component": [
+    {
+      "id": "2",
+      "caption": "获取服务器当前时间",
+      "name": "GetServerNowSystemTime",
+      "showId": "2",
+      "geometry": {
+        "x": 276,
+        "y": 230,
+        "width": 180,
+        "height": 40
+      },
+      "runType": "sync",
+      "timeout": 0,
+      "inArgs": {
+        "arg": [
+          {
+            "name": "format",
+            "caption": "时间输出格式字符串，如yyyyMMddHHmmss",
+            "description": "类型:String，时间输出的格式",
+            "example": "",
+            "editor": "NORMAL",
+            "type": "",
+            "value": "\"yyyy-MM-dd HH:mm:ss\"",
+            "required": false,
+            "contains": ""
+          }
+        ]
+      },
+      "outArgs": {
+        "arg": [
+          {
+            "name": "result",
+            "caption": "获取服务器当前时间字符串",
+            "description": "类型:string，将服务器当前时间按格式输出",
+            "example": "",
+            "editor": "NORMAL",
+            "type": "",
+            "value": "varMap().now",
+            "required": false,
+            "contains": ""
+          }
+        ]
+      },
+      "out": [
+        {
+          "caption": "执行成功",
+          "name": "success",
+          "id": "1",
+          "next": "10"
+        }
+      ],
+      "exception": {
+        "name": "",
+        "next": ""
+      }
+    },
+    {
+      "id": "6",
+      "caption": "给csd的response结果赋值",
+      "name": "SignCSDResponseResult",
+      "showId": "6",
+      "geometry": {
+        "x": 258,
+        "y": 560,
+        "width": 292,
+        "height": 40
+      },
+      "runType": "sync",
+      "timeout": 0,
+      "inArgs": {
+        "arg": [
+          {
+            "name": "errorCode",
+            "caption": "错误码",
+            "description": "",
+            "example": "",
+            "editor": "NORMAL",
+            "type": "",
+            "value": "varMap().time",
+            "required": true,
+            "contains": ""
+          },
+          {
+            "name": "msg",
+            "caption": "返回信息",
+            "description": "",
+            "example": "",
+            "editor": "NORMAL",
+            "type": "",
+            "value": "varMap().now+\"  \"+varMap().milli",
+            "required": true,
+            "contains": ""
+          }
+        ]
+      },
+      "outArgs": {
+        "arg": []
+      },
+      "out": [
+        {
+          "caption": "成功",
+          "name": "success",
+          "id": "1",
+          "next": "1001"
+        }
+      ],
+      "exception": {
+        "name": "",
+        "next": "1000"
+      }
+    },
+    {
+      "id": "7",
+      "caption": "获取当前服务器时间的毫秒数",
+      "name": "GetServerNowMillisecond",
+      "showId": "1",
+      "geometry": {
+        "x": 276,
+        "y": 160,
+        "width": 228,
+        "height": 40
+      },
+      "runType": "sync",
+      "timeout": 0,
+      "inArgs": {
+        "arg": []
+      },
+      "outArgs": {
+        "arg": [
+          {
+            "name": "millisecond",
+            "caption": "long 毫秒数",
+            "description": "",
+            "example": "",
+            "editor": "NORMAL",
+            "type": "",
+            "value": "varMap().time",
+            "required": false,
+            "contains": ""
+          }
+        ]
+      },
+      "out": [
+        {
+          "caption": "成功",
+          "name": "success",
+          "id": "1",
+          "next": "2"
+        }
+      ],
+      "exception": {
+        "name": "",
+        "next": ""
+      }
+    },
+    {
+      "id": "8",
+      "caption": "索引门",
+      "name": "IndexGate",
+      "showId": "5",
+      "geometry": {
+        "x": 300,
+        "y": 500,
+        "width": 180,
+        "height": 40
+      },
+      "runType": "sync",
+      "timeout": 0,
+      "inArgs": {
+        "arg": [
+          {
+            "name": "item",
+            "caption": "物件",
+            "description": "类型:List中存放元素的类型",
+            "example": "",
+            "editor": "NORMAL",
+            "type": "",
+            "value": "",
+            "required": false,
+            "contains": ""
+          },
+          {
+            "name": "list",
+            "caption": "列表，最多五个元素",
+            "description": "类型:List",
+            "example": "",
+            "editor": "NORMAL",
+            "type": "",
+            "value": "",
+            "required": false,
+            "contains": ""
+          }
+        ]
+      },
+      "outArgs": {
+        "arg": []
+      },
+      "out": [
+        {
+          "caption": "第一个",
+          "name": "success",
+          "id": "1",
+          "next": "6"
+        },
+        {
+          "caption": "第二个",
+          "name": "fail",
+          "id": "2",
+          "next": "6"
+        },
+        {
+          "caption": "第三个",
+          "name": "minus",
+          "id": "3",
+          "next": ""
+        },
+        {
+          "caption": "第四个",
+          "name": "zero",
+          "id": "4",
+          "next": ""
+        },
+        {
+          "caption": "第五个",
+          "name": "positive",
+          "id": "5",
+          "next": ""
+        }
+      ],
+      "exception": {
+        "name": "",
+        "next": "6"
+      }
+    }
+  ]
+}

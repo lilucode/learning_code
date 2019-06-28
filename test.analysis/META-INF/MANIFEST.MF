@@ -6,4 +6,5 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.eclipse.jdt;bundle-version="3.13.1",
  org.eclipse.jdt.core;bundle-version="3.13.50",
- com.alibaba.fastjson
+ com.alibaba.fastjson;bundle-version="1.1.15"
+Import-Package: com.alibaba.fastjson

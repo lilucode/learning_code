@@ -1,16 +1,36 @@
 package cn.com.agree.afa.compiler.model;
 
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
 public class BCModel {
-	private String name;
-	private String desc;
+	private String name;	//Component/RefImpl
+	private String desc;	// Component/Desp
+	private String auth;	//Component/Auth
 	private String debugMode;
 	private boolean isDebugComplie;
 	private String aspectUsed;
-	private Set<NodeModel> nodeModels;
+	private Set<NodeModel> nodeModels;		//Node
+	private List<ComponentArg> inputArgs;	//Component/InArgs
+	private List<ComponentArg> outputArgs;	//Component/OutArgs
 	private InfoLogContext logContext = new InfoLogContext();
+
+	public List<ComponentArg> getInputArgs() {
+		return inputArgs;
+	}
+
+	public void setInputArgs(List<ComponentArg> inputArgs) {
+		this.inputArgs = inputArgs;
+	}
+
+	public List<ComponentArg> getOutputArgs() {
+		return outputArgs;
+	}
+
+	public void setOutputArgs(List<ComponentArg> outputArgs) {
+		this.outputArgs = outputArgs;
+	}
 
 	public String getName() {
 		return this.name;
@@ -22,6 +42,14 @@ public class BCModel {
 
 	public String getDesc() {
 		return this.desc;
+	}
+
+	public void setAuth(String auth) {
+		this.auth = auth;
+	}
+	
+	public String getAuth() {
+		return this.auth;
 	}
 
 	public void setDesc(String desc) {
@@ -78,7 +106,8 @@ public class BCModel {
 
 	@Override
 	public String toString() {
-		return "[BCModel] name:" + name + ",desc:" + desc + ",debugMode:" + debugMode + ",isDebugComplie:"
-				+ isDebugComplie + ",aspectUsed:" + aspectUsed + ",nodeModels:" + nodeModels;
+		return "[BCModel] name:" + name + ",desc:" + desc + ",auth:" + auth + ",debugMode:" + debugMode
+				+ ",isDebugComplie:" + isDebugComplie + ",aspectUsed:" + aspectUsed + ",nodeModels:" + nodeModels
+				+ ",inputArgs:" + inputArgs + ",outputArgs:" + outputArgs;
 	}
 }
