@@ -10,7 +10,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import cn.com.agree.ab.a5.runtime.lfc.ArgElement;
+import cn.com.agree.ab.a5.runtime.lfc.ComponentElement;
 import cn.com.agree.ab.a5.runtime.lfc.ComponentOut;
+import cn.com.agree.ab.a5.runtime.lfc.Geometry;
 import cn.com.agree.ab.a5.runtime.lfc.LfcComponentElement;
 import cn.com.agree.ab.a5.runtime.lfc.LogicFlowControl;
 import cn.com.agree.ab.a5.runtime.lfc.LogicletComponentElement;
@@ -23,6 +25,12 @@ import cn.com.agree.afa.compiler.parser.XmlParseException;
 public class BcptParser extends AbstractParser<BCModel> {
 
 	private LogicFlowControl lfc = new LogicFlowControl();
+
+	private String location;
+	private String size;
+	private String idString;
+	private String desc;
+	private String target;
 
 	public LogicFlowControl getLfc() {
 		return lfc;
@@ -37,9 +45,7 @@ public class BcptParser extends AbstractParser<BCModel> {
 
 	private BCModel getBCModel(Element component) throws XmlParseException {
 		BCModel bcModel = new BCModel();
-		// Component/Auth
-		// Component/RefImpl
-		// Component/Desp
+		// fileDescription：Component/Auth，Component/RefImpl，Component/Desp
 		String auth = getChildElementText(component, "Auth");
 		String componentName = getChildElementText(component, "RefImpl");
 		String desp = getChildElementText(component, "Desp");
@@ -50,30 +56,13 @@ public class BcptParser extends AbstractParser<BCModel> {
 		lfc.getFileDescription().setFunction(componentName);
 		lfc.getFileDescription().setRemark(desp);
 
-		// Component/InArgs
+		// lfc出入参： Component/InArgs，Component/OutArgs
 		List<ComponentArg> cInArgs = getComponentArgs(component, "In");
-		List<ArgElement> cInList=new ArrayList<ArgElement>();
-		for (ComponentArg componentArg : cInArgs) {
-			ArgElement ae = new ArgElement();
-			ae.setName(componentArg.getKey());
-			ae.setType(componentArg.getDefValue());
-			ae.setCaption(componentArg.getDesp());
-			cInList.add(ae);
-		}
-		lfc.addInArg(cInList);
-		bcModel.setInputArgs(cInArgs);
-		// Component/OutArgs
 		List<ComponentArg> cOutArgs = getComponentArgs(component, "Out");
-		List<ArgElement> cOutList=new ArrayList<ArgElement>();
-		for (ComponentArg componentArg : cOutArgs) {
-			ArgElement ae = new ArgElement();
-			ae.setName(componentArg.getKey());
-			ae.setType(componentArg.getDefValue());
-			ae.setCaption(componentArg.getDesp());
-			cOutList.add(ae);
-		}
-		lfc.addOutArg(cOutList);
+		bcModel.setInputArgs(cInArgs);
 		bcModel.setOutputArgs(cOutArgs);
+		lfc.addInArg(getArgElement(cInArgs));
+		lfc.addOutArg(getArgElement(cOutArgs));
 
 		Element implementation = getDirectChildElement(component, "Implementation");
 		bcModel.setNodeModels(getNodeModels(implementation));
@@ -98,6 +87,43 @@ public class BcptParser extends AbstractParser<BCModel> {
 			args.add(componentArg);
 		}
 		return args;
+	}
+
+	public List<ArgElement> getArgElement(List<ComponentArg> cInArgs) {
+		List<ArgElement> cInList = new ArrayList<ArgElement>();
+		for (ComponentArg componentArg : cInArgs) {
+			ArgElement ae = new ArgElement();
+			ae.setName(componentArg.getKey());
+			ae.setType(componentArg.getDefValue());
+			ae.setCaption(componentArg.getDesp());
+			cInList.add(ae);
+		}
+		return cInList;
+	}
+
+	public List<ArgElement> getArgComponent(List<Arg> cInArgs) {
+		List<ArgElement> cInList = new ArrayList<ArgElement>();
+		for (Arg componentArg : cInArgs) {
+			ArgElement ae = new ArgElement();
+			ae.setName(componentArg.getKey());
+			ae.setCaption(componentArg.getName());
+			ae.setType(componentArg.getType());
+			cInList.add(ae);
+		}
+		return cInList;
+	}
+
+	public List<ArgElement> getArgLfc(List<Arg> cInArgs) {
+		List<ArgElement> cInList = new ArrayList<ArgElement>();
+		for (Arg componentArg : cInArgs) {
+			ArgElement ae = new ArgElement();
+			ae.setName(componentArg.getKey());
+			ae.setCaption(componentArg.getName());
+			ae.setType(componentArg.getType());
+			ae.setValue(componentArg.getArg());
+			cInList.add(ae);
+		}
+		return cInList;
 	}
 
 	protected Set<NodeModel> getNodeModels(Element impl) throws XmlParseException {
@@ -136,15 +162,15 @@ public class BcptParser extends AbstractParser<BCModel> {
 		// Component/Implementation/Node/Type
 		int type = Integer.parseInt(getChildElementText(node, "Type"));
 		// Component/Implementation/Node/Id
-		String idString = getChildElementText(node, "Id");
+		idString = getChildElementText(node, "Id");
 		// Component/Implementation/Node/Desp
-		String desc = getChildElementText(node, "Desp");
+		desc = getChildElementText(node, "Desp");
 		int atIndex = desc.indexOf("@");
 		if (atIndex >= 0) {
 			desc = desc.substring(atIndex + 1);
 		}
 		// Component/Implementation/Node/Target
-		String target = getChildElementText(node, "Target");
+		target = getChildElementText(node, "Target");
 		nodeModel.setType(type);
 		nodeModel.setIdString(idString);
 		nodeModel.setDesc(desc);
@@ -152,177 +178,54 @@ public class BcptParser extends AbstractParser<BCModel> {
 
 		Element constraint = getDirectChildElement(node, "Constraint");
 		// Component/Implementation/Node/Constraint/Location
-		String location = getChildElementText(constraint, "Location");
+		location = getChildElementText(constraint, "Location");
 		// Component/Implementation/Node/Constraint/Size
-		String size = getChildElementText(constraint, "Size");
+		size = getChildElementText(constraint, "Size");
 		nodeModel.setLocation(location);
 		nodeModel.setSize(size);
 
-		
 		if (type == 11) {
 			LogicletComponentElement ce = new LogicletComponentElement();
-			ce.setId(idString);
-			ce.setShowId(idString);
-			ce.setCaption(desc);
-			ce.setName(target.substring(target.lastIndexOf(".") + 1));
-			ce.getGeometry().setX(Integer.parseInt(location.substring(0, location.lastIndexOf(","))));
-			ce.getGeometry().setY(Integer.parseInt(location.substring(location.lastIndexOf(",") + 1)));
-			ce.getGeometry().setWidth(Integer.parseInt(size.substring(0, size.lastIndexOf(","))));
-			ce.getGeometry().setHeight(Integer.parseInt(size.substring(size.lastIndexOf(",") + 1)));
 
 			List<Arg> cInArgs = getArgs(node, "In");
-			List<ArgElement> cInList=new ArrayList<ArgElement>();
-			for (Arg componentArg : cInArgs) {
-				ArgElement ae = new ArgElement();
-				ae.setName(componentArg.getKey());
-				ae.setCaption(componentArg.getName());
-				ae.setType(componentArg.getType());
-				ae.setValue(componentArg.getArg());
-				cInList.add(ae);
-			}
-			ce.addInArg(cInList);
+			ce.addInArg(getArgComponent(cInArgs));
 			nodeModel.setInputArgs(cInArgs);
 			// Component/OutArgs
 			List<Arg> cOutArgs = getArgs(node, "Out");
-			List<ArgElement> cOutList=new ArrayList<ArgElement>();
-			for (Arg componentArg : cOutArgs) {
-				ArgElement ae = new ArgElement();
-				ae.setName(componentArg.getKey());
-				ae.setCaption(componentArg.getName());
-				ae.setType(componentArg.getType());
-				ae.setValue(componentArg.getArg());
-				cOutList.add(ae);
-			}
-			ce.addOutArg(cOutList);
+			ce.addOutArg(getArgComponent(cOutArgs));
 			nodeModel.setOutputArgs(cOutArgs);
-			// Component/Implementation/Node/Terminals/
-			Element parallelTerminals = getDirectChildElement(node, "Terminals");
-			if (parallelTerminals != null) {
-				
-				// Component/Implementation/Node/Terminals/Terminal
-				List<Element> terminals = getDirectChildElements(parallelTerminals, "Terminal");
-				
-				for (Element terminalVariable : terminals) {
-					// Component/Implementation/Node/Terminals/Terminal/Name
-					String terminalName = getChildElementText(terminalVariable, "Name");
-					nodeModel.setTerminalName(terminalName);
-					String sourceTerminal = terminalName;
-					// Component/Implementation/Node/Terminals/Terminal/Desp
-					String terminalDesc = getChildElementText(terminalVariable, "Desp");
-					nodeModel.setTerminalDesc(terminalDesc);
-					Element sourceConnections = getDirectChildElement(
-							(Element) terminalVariable.getParentNode().getParentNode(), "SourceConnections");
-					if (sourceConnections == null) {
-						throw new XmlParseException("sourceConnections is null");
-					}
-					List<Element> connections = getDirectChildElements(sourceConnections, "Connection");
-					for (Element connection : connections) {
-						// Component/Implementation/Node/SourceConnections/Connection/SourceTermina
-						if (sourceTerminal.equals(getChildElementText(connection, "SourceTerminal"))) {
-							
-							// Component/Implementation/Node/SourceConnections/Connection/targetId
-							String targetNodeId = getChildElementText(connection, "targetId");
-							nodeModel.setTargetNodeId(targetNodeId);
-							if(!terminalDesc.equals("失败")) {
-								
-								ComponentOut out=new ComponentOut();
-								out.setCaption(terminalDesc);
-								out.setName(terminalName);
-								out.setNext(targetNodeId);
-								ce.addOut(out);
-							}else {
-								ce.getException().put("name", "");
-								ce.getException().put("next", targetNodeId);
-							}
-							break;
-						}
-					}
-				}
-			}
-			
+
+			setLfcAndComponent(ce, type, node, nodeModel);
+
 			lfc.addComponent(ce);
 		} else if (type == 7 || type == 12) {
 			LfcComponentElement lce = new LfcComponentElement();
-			lce.setId(idString);
-			lce.setShowId(idString);
-			lce.setCaption(desc);
-			lce.setName(target.substring(target.lastIndexOf(".") + 1));
-			
-			lce.getGeometry().setX(Integer.parseInt(location.substring(0, location.lastIndexOf(","))));
-			lce.getGeometry().setY(Integer.parseInt(location.substring(location.lastIndexOf(",") + 1)));
-			lce.getGeometry().setWidth(Integer.parseInt(size.substring(0, size.lastIndexOf(","))));
-			lce.getGeometry().setHeight(Integer.parseInt(size.substring(size.lastIndexOf(",") + 1)));
-			
+			if (type == 7) {
+				// Component/Implementation/Node/FilePath
+				String path = getChildElementText(node, "FilePath");
+				lce.setMappingPath(path.substring(path.lastIndexOf("/"), path.lastIndexOf(".")) + ".lfc");
+			} else {
+
+			}
+
 			List<Arg> cInArgs = getArgs(node, "In");
-			List<ArgElement> cInList=new ArrayList<ArgElement>();
 			for (Arg componentArg : cInArgs) {
-				ArgElement ae = new ArgElement();
-				ae.setName(componentArg.getKey());
-				ae.setCaption(componentArg.getName());
-				ae.setType(componentArg.getType());
-				ae.setValue(componentArg.getArg());
-				cInList.add(ae);
-			}
-			lce.addInArg(cInList);
-			nodeModel.setInputArgs(cInArgs);
-			// Component/OutArgs
-			List<Arg> cOutArgs = getArgs(node, "Out");
-			List<ArgElement> cOutList=new ArrayList<ArgElement>();
-			for (Arg componentArg : cOutArgs) {
-				ArgElement ae = new ArgElement();
-				ae.setName(componentArg.getKey());
-				ae.setCaption(componentArg.getName());
-				ae.setType(componentArg.getType());
-				ae.setValue(componentArg.getArg());
-				cOutList.add(ae);
-			}
-			lce.addOutArg(cOutList);
-			nodeModel.setOutputArgs(cOutArgs);
-			// Component/Implementation/Node/Terminals/
-			Element parallelTerminals = getDirectChildElement(node, "Terminals");
-			if (parallelTerminals != null) {
-				
-				// Component/Implementation/Node/Terminals/Terminal
-				List<Element> terminals = getDirectChildElements(parallelTerminals, "Terminal");
-				
-				for (Element terminalVariable : terminals) {
-					// Component/Implementation/Node/Terminals/Terminal/Name
-					String terminalName = getChildElementText(terminalVariable, "Name");
-					nodeModel.setTerminalName(terminalName);
-					String sourceTerminal = terminalName;
-					// Component/Implementation/Node/Terminals/Terminal/Desp
-					String terminalDesc = getChildElementText(terminalVariable, "Desp");
-					nodeModel.setTerminalDesc(terminalDesc);
-					Element sourceConnections = getDirectChildElement(
-							(Element) terminalVariable.getParentNode().getParentNode(), "SourceConnections");
-					if (sourceConnections == null) {
-						throw new XmlParseException("sourceConnections is null");
-					}
-					List<Element> connections = getDirectChildElements(sourceConnections, "Connection");
-					for (Element connection : connections) {
-						// Component/Implementation/Node/SourceConnections/Connection/SourceTermina
-						if (sourceTerminal.equals(getChildElementText(connection, "SourceTerminal"))) {
-							
-							// Component/Implementation/Node/SourceConnections/Connection/targetId
-							String targetNodeId = getChildElementText(connection, "targetId");
-							nodeModel.setTargetNodeId(targetNodeId);
-							if(!terminalDesc.equals("失败")) {
-								
-								ComponentOut out=new ComponentOut();
-								out.setCaption(terminalDesc);
-								out.setName(terminalName);
-								out.setNext(targetNodeId);
-								lce.addOut(out);
-							}else {
-								lce.getException().put("name", "");
-								lce.getException().put("next", targetNodeId);
-							}
-							break;
-						}
+				if (type == 12) {
+					if (componentArg.getKey().equals("tc")) {
+						// Component/Implementation/Node/InArgs/Arg/Key
+						lce.setMappingPath(componentArg.getArg());
 					}
 				}
 			}
+			lce.addInArg(getArgLfc(cInArgs));
+			nodeModel.setInputArgs(cInArgs);
+			// Component/OutArgs
+			List<Arg> cOutArgs = getArgs(node, "Out");
+			lce.addOutArg(getArgLfc(cOutArgs));
+			nodeModel.setOutputArgs(cOutArgs);
+
 			
+			setLfcAndComponent(lce, type, node, nodeModel);
 			lfc.addLfc(lce);
 		}
 
@@ -332,22 +235,69 @@ public class BcptParser extends AbstractParser<BCModel> {
 					getDirectChildElement(getDirectChildElement(node, "SourceConnections"), "Connection"), "targetId");
 			nodeModel.setTargetId(targetId);
 			lfc.setStart(targetId);
-			lfc.getGeometry().setX(Integer.parseInt(location.substring(0, location.lastIndexOf(","))));
-			lfc.getGeometry().setY(Integer.parseInt(location.substring(location.lastIndexOf(",") + 1)));
-			lfc.getGeometry().setWidth(Integer.parseInt(size.substring(0, size.lastIndexOf(","))));
-			lfc.getGeometry().setHeight(Integer.parseInt(size.substring(size.lastIndexOf(",") + 1)));
+			setGeometry(lfc.getGeometry());
 		} else if (desc.equals("正常结束")) {
 			// Component/Implementation/Node/Id
 			String endId = getChildElementText(node, "Id");
 			nodeModel.setEndId(endId);
 			lfc.setEnd(endId);
-			lfc.getEndstep().getGeometry().setX(Integer.parseInt(location.substring(0, location.lastIndexOf(","))));
-			lfc.getEndstep().getGeometry().setY(Integer.parseInt(location.substring(location.lastIndexOf(",") + 1)));
-			lfc.getEndstep().getGeometry().setWidth(Integer.parseInt(size.substring(0, size.lastIndexOf(","))));
-			lfc.getEndstep().getGeometry().setHeight(Integer.parseInt(size.substring(size.lastIndexOf(",") + 1)));
+			setGeometry(lfc.getEndstep().getGeometry());
 		}
 
 		return nodeModel;
+	}
+
+	public void setLfcAndComponent(ComponentElement ce, int type,Element node,NodeModel nodeModel) throws XmlParseException {
+		ce.setId(idString);
+		ce.setShowId(idString);
+		ce.setCaption(desc);
+		ce.setName(target.substring(target.lastIndexOf(".") + 1));
+		setGeometry(ce.getGeometry());
+
+		// Component/Implementation/Node/Terminals/
+		Element parallelTerminals = getDirectChildElement(node, "Terminals");
+		if (parallelTerminals != null) {
+
+			// Component/Implementation/Node/Terminals/Terminal
+			List<Element> terminals = getDirectChildElements(parallelTerminals, "Terminal");
+
+			for (Element terminalVariable : terminals) {
+				// Component/Implementation/Node/Terminals/Terminal/Name
+				String terminalName = getChildElementText(terminalVariable, "Name");
+				nodeModel.setTerminalName(terminalName);
+				String sourceTerminal = terminalName;
+				// Component/Implementation/Node/Terminals/Terminal/Desp
+				String terminalDesc = getChildElementText(terminalVariable, "Desp");
+				nodeModel.setTerminalDesc(terminalDesc);
+				Element sourceConnections = getDirectChildElement(
+						(Element) terminalVariable.getParentNode().getParentNode(), "SourceConnections");
+				if (sourceConnections == null) {
+					throw new XmlParseException("sourceConnections is null");
+				}
+				List<Element> connections = getDirectChildElements(sourceConnections, "Connection");
+				for (Element connection : connections) {
+					// Component/Implementation/Node/SourceConnections/Connection/SourceTermina
+					if (sourceTerminal.equals(getChildElementText(connection, "SourceTerminal"))) {
+
+						// Component/Implementation/Node/SourceConnections/Connection/targetId
+						String targetNodeId = getChildElementText(connection, "targetId");
+						nodeModel.setTargetNodeId(targetNodeId);
+						if (!terminalDesc.equals("失败")) {
+
+							ComponentOut out = new ComponentOut();
+							out.setCaption(terminalDesc);
+							out.setName(terminalName);
+							out.setNext(targetNodeId);
+							ce.addOut(out);
+						} else {
+							ce.getException().put("name", "");
+							ce.getException().put("next", targetNodeId);
+						}
+						break;
+					}
+				}
+			}
+		}
 	}
 
 	// 出入参
@@ -371,12 +321,20 @@ public class BcptParser extends AbstractParser<BCModel> {
 			// Component/Implementation/Node/InArgs/Arg/Name
 			arg.setName(getChildElementText(argElement, "Name"));
 			// Component/Implementation/Node/InArgs/Arg/Type
-//			arg.setType(getChildElementText(argElement, "Type"));
+			arg.setType(getChildElementText(argElement, "Type"));
 			// Component/Implementation/Node/InArgs/Arg/Arg
-			// arg.setArg(getChildElementText(argElement, "Arg"));
+			arg.setArg(getChildElementText(argElement, "Arg"));
 			args.add(arg);
 		}
 		return args;
+	}
+
+	// 设置geometry
+	public void setGeometry(Geometry geometry) {
+		geometry.setX(Integer.parseInt(location.substring(0, location.lastIndexOf(","))));
+		geometry.setY(Integer.parseInt(location.substring(location.lastIndexOf(",") + 1)));
+		geometry.setWidth(Integer.parseInt(size.substring(0, size.lastIndexOf(","))));
+		geometry.setHeight(Integer.parseInt(size.substring(size.lastIndexOf(",") + 1)));
 	}
 
 	@Override

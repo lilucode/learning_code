@@ -32,8 +32,27 @@ public abstract class ComponentElement
     private List<ComponentOut> out = new ArrayList<ComponentOut>();
     
     private Map<String, String> exception = new ConcurrentHashMap<String, String>();
-
     
+    private String name;
+
+    private Geometry geometry = new Geometry();
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public Geometry getGeometry() {
+		return geometry;
+	}
+
+	public void setGeometry(Geometry geometry) {
+		this.geometry = geometry;
+	}
+
 	public Map<String, String> getException() {
 		return exception;
 	}
