@@ -68,7 +68,8 @@ abstract class AbstractParser<T> implements IParser<T> {
 	protected String getChildElementText(Element element, String childElementName) throws XmlParseException {
 		Element childElement = getDirectChildElement(element, childElementName);
 		if (childElement == null) {
-			throw new XmlParseException(element.getTagName() + "节点没有" + childElementName + "子节点");
+//			System.out.println(element.getTagName() + "节点没有" + childElementName + "子节点");
+			return null;
 		}
 		return childElement.getTextContent();
 	}
