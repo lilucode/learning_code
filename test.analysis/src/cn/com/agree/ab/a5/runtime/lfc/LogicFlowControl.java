@@ -13,8 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author PuYun &lt;pu.yun@agree.com.cn&gt; 2014年3月11日 下午4:24:19
  * 
  */
-// @JSONType(orders = { "start", "caption", "geometry", "fileDescription",
-// "dnc", "inArgMap", "outArgMap", "endValueMap","componentElementMap" })
+@SuppressWarnings("rawtypes")
 public class LogicFlowControl implements IDncContainer {
 
 	private String start = "";

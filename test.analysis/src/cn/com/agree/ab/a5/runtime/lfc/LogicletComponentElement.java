@@ -10,33 +10,5 @@ package cn.com.agree.ab.a5.runtime.lfc;
  */
 public class LogicletComponentElement extends ComponentElement
 {
-    private String name;
 
-    private Geometry geometry = new Geometry();
-
-    
-    public Geometry getGeometry() {
-		return geometry;
-	}
-
-	public void setGeometry(Geometry geometry) {
-		this.geometry = geometry;
-	}
-
-	/**
-     * @return the name
-     */
-    public String getName()
-    {
-        return name;
-    }
-
-    /**
-     * @param name
-     *        the name to set
-     */
-    public void setName(String name)
-    {
-        this.name = name;
-    }
 }
