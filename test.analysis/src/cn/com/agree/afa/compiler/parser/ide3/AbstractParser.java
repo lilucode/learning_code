@@ -263,25 +263,7 @@ abstract class AbstractParser<T> implements IParser<T> {
 		}
 	}
 
-	// bcpt的出入参
-	protected List<ComponentArg> getComponentArgs(Element parent, String typePrefix) throws XmlParseException {
-		List<ComponentArg> args = new ArrayList<>();
-		Element argsElement = getDirectChildElement(parent, typePrefix + "Args");
-		if (argsElement == null) {
-			return args;
-		}
-		for (Element argElement : getDirectChildElements(argsElement, "Arg")) {
-			ComponentArg componentArg = new ComponentArg();
-			// Component/InArgs/Arg/Key
-			componentArg.setKey(getChildElementText(argElement, "Key"));
-			// Component/InArgs/Arg/DefValue
-			componentArg.setDefValue(getChildElementText(argElement, "DefValue"));
-			// Component/InArgs/Arg/Desp
-			componentArg.setDesp(getChildElementText(argElement, "Desp"));
-			args.add(componentArg);
-		}
-		return args;
-	}
+	
 
 	// 出入参
 	protected List<Arg> getArgs(Element parent, String typePrefix) throws XmlParseException {

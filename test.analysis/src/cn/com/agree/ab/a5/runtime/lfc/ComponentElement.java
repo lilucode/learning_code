@@ -4,6 +4,8 @@
  */
 package cn.com.agree.ab.a5.runtime.lfc;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -19,40 +21,39 @@ public abstract class ComponentElement
 
     private String description;
     
-    private String exceptionNext;
-
     private String id;
     
     private String showId;
 
-    private Map<String, ArgElement> inArgMap = new ConcurrentHashMap<String, ArgElement>();
+    private Map<String, List<ArgElement>> inArgMap = new ConcurrentHashMap<String, List<ArgElement>>();
 
-    private Map<String, ArgElement> outArgMap = new ConcurrentHashMap<String, ArgElement>();
+    private Map<String, List<ArgElement>> outArgMap = new ConcurrentHashMap<String, List<ArgElement>>();
 
-    private Map<String, String> outNextMap = new ConcurrentHashMap<String, String>();
+    private List<ComponentOut> out = new ArrayList<ComponentOut>();
+    
+    private Map<String, String> exception = new ConcurrentHashMap<String, String>();
 
-    /**
-     * 
-     */
-    public void addInArg(ArgElement ae)
+    
+	public Map<String, String> getException() {
+		return exception;
+	}
+
+	public List<ComponentOut> getOut() {
+		return out;
+	}
+
+	public void addOut(ComponentOut outNextMap) {
+		this.out.add(outNextMap);
+	}
+
+    public void addInArg(List<ArgElement> ae)
     {
-        inArgMap.put(ae.getName(), ae);
+        inArgMap.put("arg", ae);
     }
 
-    /**
-     * 
-     */
-    public void addOutArg(ArgElement ae)
+    public void addOutArg(List<ArgElement> ae)
     {
-        outArgMap.put(ae.getName(), ae);
-    }
-
-    /**
-     * 
-     */
-    public void addOutNext(String id, String next)
-    {
-        outNextMap.put(id, next);
+        outArgMap.put("arg", ae);
     }
 
     /**
@@ -71,13 +72,6 @@ public abstract class ComponentElement
         return description;
     }
 
-    /**
-     * @return the exceptionNext
-     */
-    public String getExceptionNext()
-    {
-        return exceptionNext;
-    }
 
     /**
      * @return the id
@@ -90,7 +84,7 @@ public abstract class ComponentElement
     /**
      * @return the inArgMap
      */
-    public Map<String, ArgElement> getInArgMap()
+    public Map<String, List<ArgElement>> getInArgMap()
     {
         return inArgMap;
     }
@@ -98,18 +92,11 @@ public abstract class ComponentElement
     /**
      * @return the outArgMap
      */
-    public Map<String, ArgElement> getOutArgMap()
+    public Map<String, List<ArgElement>> getOutArgMap()
     {
         return outArgMap;
     }
 
-    /**
-     * @return the outNextMap
-     */
-    public Map<String, String> getOutNextMap()
-    {
-        return outNextMap;
-    }
 
 
     /**
@@ -129,14 +116,6 @@ public abstract class ComponentElement
         this.description = description;
     }
 
-	/**
-     * @param exceptionNext
-     *        the exceptionNext to set
-     */
-    public void setExceptionNext(String exceptionNext)
-    {
-        this.exceptionNext = exceptionNext;
-    }
 
 	/**
      * @param id

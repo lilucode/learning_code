@@ -4,17 +4,20 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import cn.com.agree.ab.a5.runtime.lfc.LogicFlowControl;
+
 public class BCModel {
-	private String name;	//Component/RefImpl
-	private String desc;	// Component/Desp
-	private String auth;	//Component/Auth
+	private String name; // Component/RefImpl
+	private String desc; // Component/Desp
+	private String auth; // Component/Auth
 	private String debugMode;
 	private boolean isDebugComplie;
 	private String aspectUsed;
-	private Set<NodeModel> nodeModels;		//Node
-	private List<ComponentArg> inputArgs;	//Component/InArgs
-	private List<ComponentArg> outputArgs;	//Component/OutArgs
+	private Set<NodeModel> nodeModels; // Node
+	private List<ComponentArg> inputArgs; // Component/InArgs
+	private List<ComponentArg> outputArgs; // Component/OutArgs
 	private InfoLogContext logContext = new InfoLogContext();
+
 
 	public List<ComponentArg> getInputArgs() {
 		return inputArgs;
@@ -47,7 +50,7 @@ public class BCModel {
 	public void setAuth(String auth) {
 		this.auth = auth;
 	}
-	
+
 	public String getAuth() {
 		return this.auth;
 	}
@@ -106,8 +109,10 @@ public class BCModel {
 
 	@Override
 	public String toString() {
-		return "[BCModel] name:" + name + ",desc:" + desc + ",auth:" + auth + ",debugMode:" + debugMode
-				+ ",isDebugComplie:" + isDebugComplie + ",aspectUsed:" + aspectUsed + ",nodeModels:" + nodeModels
-				+ ",inputArgs:" + inputArgs + ",outputArgs:" + outputArgs;
+		return "[BCModel] name:" + name + ",desc:" + desc + ",auth:" + auth
+				+ ",debugMode:" + debugMode + ",isDebugComplie:"
+				+ isDebugComplie + ",aspectUsed:" + aspectUsed + ",nodeModels:"
+				+ nodeModels + ",inputArgs:" + inputArgs + ",outputArgs:"
+				+ outputArgs;
 	}
 }

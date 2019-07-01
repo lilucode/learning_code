@@ -4,7 +4,7 @@ Bundle-Name: Analysis
 Bundle-SymbolicName: test.analysis
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Require-Bundle: org.eclipse.jdt;bundle-version="3.13.1",
- org.eclipse.jdt.core;bundle-version="3.13.50",
- com.alibaba.fastjson;bundle-version="1.1.15"
+Require-Bundle: com.alibaba.fastjson;bundle-version="1.1.15",
+ org.eclipse.jdt;bundle-version="3.9.0",
+ org.eclipse.jdt.core;bundle-version="3.9.0"
 Import-Package: com.alibaba.fastjson
