@@ -15,10 +15,9 @@ import java.util.List;
 public class LfcComponentElement extends ComponentElement {
 	private String path;
 	private String mappingPath = "";
-	private String lfcPath;
+	private String lfcPath = "";
 	private List mappings = new ArrayList();
 	private List ades = new ArrayList();
-
 
 	private FileDescription fileDescription = new FileDescription();
 
@@ -54,7 +53,6 @@ public class LfcComponentElement extends ComponentElement {
 		this.ades = ades;
 	}
 
-
 	public FileDescription getFileDescription() {
 		return fileDescription;
 	}
@@ -77,6 +75,5 @@ public class LfcComponentElement extends ComponentElement {
 	public void setPath(String path) {
 		this.path = path;
 	}
-
 
 }

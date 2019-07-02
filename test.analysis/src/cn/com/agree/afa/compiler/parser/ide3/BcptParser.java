@@ -9,6 +9,7 @@ import java.util.TreeSet;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import cn.com.agree.ab.a5.runtime.lfc.ArgComponent;
 import cn.com.agree.ab.a5.runtime.lfc.ArgElement;
 import cn.com.agree.ab.a5.runtime.lfc.ComponentElement;
 import cn.com.agree.ab.a5.runtime.lfc.ComponentOut;
@@ -26,11 +27,14 @@ public class BcptParser extends AbstractParser<BCModel> {
 
 	private LogicFlowControl lfc = new LogicFlowControl();
 
+	// Component/Implementation/Node/Constraint/Location
 	private String location;
+	// Component/Implementation/Node/Constraint/Size
 	private String size;
 	private String idString;
 	private String desc;
 	private String target;
+	private String end_id;
 
 	public LogicFlowControl getLfc() {
 		return lfc;
@@ -61,69 +65,12 @@ public class BcptParser extends AbstractParser<BCModel> {
 		List<ComponentArg> cOutArgs = getComponentArgs(component, "Out");
 		bcModel.setInputArgs(cInArgs);
 		bcModel.setOutputArgs(cOutArgs);
-		lfc.addInArg(getArgElement(cInArgs));
-		lfc.addOutArg(getArgElement(cOutArgs));
+		lfc.addInArgs(getArgElement(cInArgs));
+		lfc.addOutArgs(getArgElement(cOutArgs));
 
 		Element implementation = getDirectChildElement(component, "Implementation");
 		bcModel.setNodeModels(getNodeModels(implementation));
 		return bcModel;
-	}
-
-	// bcpt的出入参
-	protected List<ComponentArg> getComponentArgs(Element parent, String typePrefix) throws XmlParseException {
-		List<ComponentArg> args = new ArrayList<>();
-		Element argsElement = getDirectChildElement(parent, typePrefix + "Args");
-		if (argsElement == null) {
-			return args;
-		}
-		for (Element argElement : getDirectChildElements(argsElement, "Arg")) {
-			ComponentArg componentArg = new ComponentArg();
-			// Component/InArgs/Arg/Key
-			componentArg.setKey(getChildElementText(argElement, "Key"));
-			// Component/InArgs/Arg/DefValue
-			componentArg.setDefValue(getChildElementText(argElement, "DefValue"));
-			// Component/InArgs/Arg/Desp
-			componentArg.setDesp(getChildElementText(argElement, "Desp"));
-			args.add(componentArg);
-		}
-		return args;
-	}
-
-	public List<ArgElement> getArgElement(List<ComponentArg> cInArgs) {
-		List<ArgElement> cInList = new ArrayList<ArgElement>();
-		for (ComponentArg componentArg : cInArgs) {
-			ArgElement ae = new ArgElement();
-			ae.setName(componentArg.getKey());
-			ae.setType(componentArg.getDefValue());
-			ae.setCaption(componentArg.getDesp());
-			cInList.add(ae);
-		}
-		return cInList;
-	}
-
-	public List<ArgElement> getArgComponent(List<Arg> cInArgs) {
-		List<ArgElement> cInList = new ArrayList<ArgElement>();
-		for (Arg componentArg : cInArgs) {
-			ArgElement ae = new ArgElement();
-			ae.setName(componentArg.getKey());
-			ae.setCaption(componentArg.getName());
-			ae.setType(componentArg.getType());
-			cInList.add(ae);
-		}
-		return cInList;
-	}
-
-	public List<ArgElement> getArgLfc(List<Arg> cInArgs) {
-		List<ArgElement> cInList = new ArrayList<ArgElement>();
-		for (Arg componentArg : cInArgs) {
-			ArgElement ae = new ArgElement();
-			ae.setName(componentArg.getKey());
-			ae.setCaption(componentArg.getName());
-			ae.setType(componentArg.getType());
-			ae.setValue(componentArg.getArg());
-			cInList.add(ae);
-		}
-		return cInList;
 	}
 
 	protected Set<NodeModel> getNodeModels(Element impl) throws XmlParseException {
@@ -137,6 +84,7 @@ public class BcptParser extends AbstractParser<BCModel> {
 			throw new XmlParseException("缺少Node节点");
 		}
 		Set<NodeModel> nodeModels = new TreeSet<>();
+		changeEndId(nodeList);
 		for (Element node : nodeList) {
 			NodeModel nodeModel = null;
 			try {
@@ -156,6 +104,16 @@ public class BcptParser extends AbstractParser<BCModel> {
 		return nodeModels;
 	}
 
+	public void changeEndId(Collection<Element> nodeList) throws XmlParseException {
+		for (Element node : nodeList) {
+			String desp=getChildElementText(node, "Desp");
+			if(desp.equals("正常结束")) {
+				end_id = getChildElementText(node, "Id");
+				break;
+			}
+		}
+	}
+	
 	// 把ide右侧的node节点，转换成NodeModel
 	private NodeModel getNodeModel(Element node) throws XmlParseException {
 		NodeModel nodeModel = new NodeModel();
@@ -177,9 +135,7 @@ public class BcptParser extends AbstractParser<BCModel> {
 		nodeModel.setCptName(target);
 
 		Element constraint = getDirectChildElement(node, "Constraint");
-		// Component/Implementation/Node/Constraint/Location
 		location = getChildElementText(constraint, "Location");
-		// Component/Implementation/Node/Constraint/Size
 		size = getChildElementText(constraint, "Size");
 		nodeModel.setLocation(location);
 		nodeModel.setSize(size);
@@ -188,11 +144,11 @@ public class BcptParser extends AbstractParser<BCModel> {
 			LogicletComponentElement ce = new LogicletComponentElement();
 
 			List<Arg> cInArgs = getArgs(node, "In");
-			ce.addInArg(getArgComponent(cInArgs));
+			ce.addInArgs(getArgComponent(cInArgs));
 			nodeModel.setInputArgs(cInArgs);
 			// Component/OutArgs
 			List<Arg> cOutArgs = getArgs(node, "Out");
-			ce.addOutArg(getArgComponent(cOutArgs));
+			ce.addOutArgs(getArgComponent(cOutArgs));
 			nodeModel.setOutputArgs(cOutArgs);
 
 			setLfcAndComponent(ce, type, node, nodeModel);
@@ -203,9 +159,7 @@ public class BcptParser extends AbstractParser<BCModel> {
 			if (type == 7) {
 				// Component/Implementation/Node/FilePath
 				String path = getChildElementText(node, "FilePath");
-				lce.setMappingPath(path.substring(path.lastIndexOf("/"), path.lastIndexOf(".")) + ".lfc");
-			} else {
-
+				lce.setLfcPath(path.substring(path.lastIndexOf("/"), path.lastIndexOf(".")) + ".lfc");
 			}
 
 			List<Arg> cInArgs = getArgs(node, "In");
@@ -213,18 +167,17 @@ public class BcptParser extends AbstractParser<BCModel> {
 				if (type == 12) {
 					if (componentArg.getKey().equals("tc")) {
 						// Component/Implementation/Node/InArgs/Arg/Key
-						lce.setMappingPath(componentArg.getArg());
+						lce.setLfcPath(componentArg.getArg());
 					}
 				}
 			}
-			lce.addInArg(getArgLfc(cInArgs));
+			lce.addInArgs(getArgLfc(cInArgs));
 			nodeModel.setInputArgs(cInArgs);
 			// Component/OutArgs
 			List<Arg> cOutArgs = getArgs(node, "Out");
-			lce.addOutArg(getArgLfc(cOutArgs));
+			lce.addOutArgs(getArgLfc(cOutArgs));
 			nodeModel.setOutputArgs(cOutArgs);
 
-			
 			setLfcAndComponent(lce, type, node, nodeModel);
 			lfc.addLfc(lce);
 		}
@@ -234,24 +187,27 @@ public class BcptParser extends AbstractParser<BCModel> {
 			String targetId = getChildElementText(
 					getDirectChildElement(getDirectChildElement(node, "SourceConnections"), "Connection"), "targetId");
 			nodeModel.setTargetId(targetId);
-			lfc.setStart(targetId);
+			lfc.setStart(Integer.valueOf(targetId));
 			setGeometry(lfc.getGeometry());
 		} else if (desc.equals("正常结束")) {
 			// Component/Implementation/Node/Id
 			String endId = getChildElementText(node, "Id");
 			nodeModel.setEndId(endId);
-			lfc.setEnd(endId);
+			lfc.setEnd("1001");
 			setGeometry(lfc.getEndstep().getGeometry());
 		}
 
 		return nodeModel;
 	}
 
-	public void setLfcAndComponent(ComponentElement ce, int type,Element node,NodeModel nodeModel) throws XmlParseException {
+	// Node转换成内嵌lfc和技术组件
+	public void setLfcAndComponent(ComponentElement ce, int type, Element node, NodeModel nodeModel)
+			throws XmlParseException {
 		ce.setId(idString);
 		ce.setShowId(idString);
 		ce.setCaption(desc);
-		ce.setName(target.substring(target.lastIndexOf(".") + 1));
+		String target_name = target.substring(target.lastIndexOf(".") + 1) + "Logiclet";
+		ce.setName(target_name.substring(0, 1).toUpperCase() + target_name.substring(1));
 		setGeometry(ce.getGeometry());
 
 		// Component/Implementation/Node/Terminals/
@@ -287,11 +243,18 @@ public class BcptParser extends AbstractParser<BCModel> {
 							ComponentOut out = new ComponentOut();
 							out.setCaption(terminalDesc);
 							out.setName(terminalName);
-							out.setNext(targetNodeId);
+							if(targetNodeId.equals(end_id)) {
+								out.setNext("1001");
+							}else {
+								out.setNext(targetNodeId);
+							}
 							ce.addOut(out);
 						} else {
-							ce.getException().put("name", "");
-							ce.getException().put("next", targetNodeId);
+							if(targetNodeId.equals(end_id)) {
+								ce.getException().setNext("1001");
+							}else {
+								ce.getException().setNext(targetNodeId);
+							}
 						}
 						break;
 					}
@@ -300,7 +263,77 @@ public class BcptParser extends AbstractParser<BCModel> {
 		}
 	}
 
-	// 出入参
+	// bcpt的出入参
+	protected List<ComponentArg> getComponentArgs(Element parent, String typePrefix) throws XmlParseException {
+		List<ComponentArg> args = new ArrayList<>();
+		Element argsElement = getDirectChildElement(parent, typePrefix + "Args");
+		if (argsElement == null) {
+			return args;
+		}
+		for (Element argElement : getDirectChildElements(argsElement, "Arg")) {
+			ComponentArg componentArg = new ComponentArg();
+			// Component/InArgs/Arg/Key
+			componentArg.setKey(getChildElementText(argElement, "Key"));
+			// Component/InArgs/Arg/DefValue
+			componentArg.setDefValue(getChildElementText(argElement, "DefValue"));
+			// Component/InArgs/Arg/Desp
+			componentArg.setDesp(getChildElementText(argElement, "Desp"));
+			args.add(componentArg);
+		}
+		return args;
+	}
+
+	// 最外层出入参放到lfc
+	public List<ArgElement> getArgElement(List<ComponentArg> Args) {
+		List<ArgElement> list = new ArrayList<ArgElement>();
+		for (ComponentArg componentArg : Args) {
+			ArgElement ae = new ArgElement();
+			ae.setName(componentArg.getKey());
+			ae.setType(componentArg.getDefValue());
+			ae.setDescription(componentArg.getDesp());
+			list.add(ae);
+		}
+		return list;
+	}
+
+	// 技术组件入参到lfc
+	public List<ArgElement> getArgComponent(List<Arg> cInArgs) {
+		List<ArgElement> cInList = new ArrayList<ArgElement>();
+		for (Arg componentArg : cInArgs) {
+			ArgComponent ae = new ArgComponent();
+			ae.setName(componentArg.getKey());
+			ae.setCaption(componentArg.getName());
+			ae.setDescription(componentArg.getType());
+			String arg_Value=componentArg.getArg();
+//			if (arg_Value.indexOf("\"") != -1) {
+//				ae.setValue(arg_Value.substring(arg_Value.indexOf("\"") + 1, arg_Value.lastIndexOf("\"")));
+//			} else {
+//				ae.setValue(arg_Value);
+//			}
+			cInList.add(ae);
+		}
+		return cInList;
+	}
+
+	// 内嵌lfc出入参到lfc
+	public List<ArgElement> getArgLfc(List<Arg> cInArgs) {
+		List<ArgElement> cInList = new ArrayList<ArgElement>();
+		for (Arg componentArg : cInArgs) {
+			ArgElement ae = new ArgElement();
+			ae.setName(componentArg.getKey());
+			ae.setType(componentArg.getType());
+			String arg_Value=componentArg.getArg();
+			if (arg_Value.indexOf("\"") != -1) {
+				ae.setValue(arg_Value.substring(arg_Value.indexOf("\"") + 1, arg_Value.lastIndexOf("\"")));
+			} else {
+				ae.setValue(arg_Value);
+			}
+			cInList.add(ae);
+		}
+		return cInList;
+	}
+
+	// Node的出入参
 	protected List<Arg> getArgs(Element parent, String typePrefix) throws XmlParseException {
 		// Component/Implementation/Node/InArgs
 		Element argsElement = getDirectChildElement(parent, typePrefix + "Args");

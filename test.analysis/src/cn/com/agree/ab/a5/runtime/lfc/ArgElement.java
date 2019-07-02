@@ -7,23 +7,24 @@ package cn.com.agree.ab.a5.runtime.lfc;
 /**
  * LFC文件中的InArg元素或OutArg元素
  * 
- * @author PuYun &lt;pu.yun@agree.com.cn&gt; 2014年3月12日 下午2:12:06
- * 
  */
-public class ArgElement
-{
-    private String caption;
+public class ArgElement {
 
-    private String content;
-    
-    private String name;
-    private String type;
-    private String example;
-    private String value="";
-    
+	private String name = "";
+	private String type = "";
+	private String description = "";
+	private String example = "";
+	private String value = "";
 
-    
-    public String getValue() {
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public String getValue() {
 		return value;
 	}
 
@@ -54,40 +55,5 @@ public class ArgElement
 	public void setName(String name) {
 		this.name = name;
 	}
-
-    /**
-     * @return the caption
-     */
-    public String getCaption()
-    {
-        return caption;
-    }
-
-    /**
-     * @return the content
-     */
-    public String getContent()
-    {
-        return content;
-    }
-
-
-    /**
-     * @param caption
-     *        the caption to set
-     */
-    public void setCaption(String caption)
-    {
-        this.caption = caption;
-    }
-
-    /**
-     * @param content
-     *        the content to set
-     */
-    public void setContent(String content)
-    {
-        this.content = content;
-    }
 
 }

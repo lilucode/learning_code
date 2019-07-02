@@ -69,7 +69,7 @@ abstract class AbstractParser<T> implements IParser<T> {
 		Element childElement = getDirectChildElement(element, childElementName);
 		if (childElement == null) {
 //			System.out.println(element.getTagName() + "节点没有" + childElementName + "子节点");
-			return null;
+			return "";
 		}
 		return childElement.getTextContent();
 	}
