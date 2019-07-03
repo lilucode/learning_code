@@ -208,9 +208,9 @@ public class BcptParser extends AbstractParser<BCModel> {
 			LfcComponentElement lce = new LfcComponentElement();
 			if (type == 7) {
 				// Component/Implementation/Node/FilePath 内嵌lfc的路径
-				lce.setLfcPath("/" + target.substring(target.lastIndexOf(".") + 1) + ".lfc");
+				lce.setLfcPath("/demo-s/business/" + target.substring(target.lastIndexOf(".") + 1) + ".lfc");
 			}else {
-				lce.setLfcPath("/" + desc + ".lfc");
+				lce.setLfcPath("/demo-s/business/" + desc + ".lfc");
 			}
 
 			List<Arg> cInArgs = getArgs(node, "In");
@@ -342,7 +342,7 @@ public class BcptParser extends AbstractParser<BCModel> {
 		for (ComponentArg componentArg : Args) {
 			ArgElement ae = new ArgElement();
 			ae.setName(componentArg.getKey());
-			ae.setType(componentArg.getDefValue());
+			ae.setExample(componentArg.getDefValue().replaceAll("\"", "\\\\\"").replaceAll("\n", ""));
 			ae.setDescription(componentArg.getDesp());
 			list.add(ae);
 		}
@@ -356,8 +356,8 @@ public class BcptParser extends AbstractParser<BCModel> {
 			ArgComponent ae = new ArgComponent();
 			ae.setName(componentArg.getKey());
 			ae.setCaption(componentArg.getName());
-			ae.setDescription(componentArg.getType());
-			String arg_Value = componentArg.getArg();
+			ae.setEditor(componentArg.getType());
+			ae.setValue(componentArg.getArg().replaceAll("\"", "\\\\\"").replaceAll("\n", ""));
 			// if (arg_Value.indexOf("\"") != -1) {
 			// ae.setValue(arg_Value.substring(arg_Value.indexOf("\"") + 1,
 			// arg_Value.lastIndexOf("\"")));
@@ -375,13 +375,14 @@ public class BcptParser extends AbstractParser<BCModel> {
 		for (Arg componentArg : cInArgs) {
 			ArgElement ae = new ArgElement();
 			ae.setName(componentArg.getKey());
-			ae.setType(componentArg.getType());
-			String arg_Value = componentArg.getArg();
-			if (arg_Value.indexOf("\"") != -1) {
-				ae.setValue(arg_Value.substring(arg_Value.indexOf("\"") + 1, arg_Value.lastIndexOf("\"")));
-			} else {
-				ae.setValue(arg_Value);
-			}
+			ae.setDescription(componentArg.getName());
+			ae.setValue(componentArg.getArg().replaceAll("\"", "\\\\\"").replaceAll("\n", ""));
+//			String arg_Value = componentArg.getArg();
+//			if (arg_Value.indexOf("\"") != -1) {
+//				ae.setValue(arg_Value.substring(arg_Value.indexOf("\"") + 1, arg_Value.lastIndexOf("\"")));
+//			} else {
+//				ae.setValue(arg_Value);
+//			}
 			cInList.add(ae);
 		}
 		return cInList;
