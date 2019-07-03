@@ -17,7 +17,7 @@ public class Endstep {
 		Map<String,String> map=new ConcurrentHashMap<String, String>();
 		map.put("caption", "正常出口");
 		map.put("name", "正常出口");
-		map.put("id", "1");
+		map.put("id", "1001");
 		this.in.add(map);
 	}
 	

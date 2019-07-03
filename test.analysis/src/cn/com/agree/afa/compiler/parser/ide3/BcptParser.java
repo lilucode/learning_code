@@ -34,7 +34,9 @@ public class BcptParser extends AbstractParser<BCModel> {
 	private String idString;
 	private String desc;
 	private String target;
-	private String end_id;
+	private List<String> end_id = new ArrayList<String>();
+	private List<String> exception_id = new ArrayList<String>();
+	public String componentName;
 
 	public LogicFlowControl getLfc() {
 		return lfc;
@@ -51,7 +53,7 @@ public class BcptParser extends AbstractParser<BCModel> {
 		BCModel bcModel = new BCModel();
 		// fileDescription：Component/Auth，Component/RefImpl，Component/Desp
 		String auth = getChildElementText(component, "Auth");
-		String componentName = getChildElementText(component, "RefImpl");
+		componentName = getChildElementText(component, "RefImpl");
 		String desp = getChildElementText(component, "Desp");
 		bcModel.setAuth(auth);
 		bcModel.setName(componentName);
@@ -106,10 +108,14 @@ public class BcptParser extends AbstractParser<BCModel> {
 
 	public void changeEndId(Collection<Element> nodeList) throws XmlParseException {
 		for (Element node : nodeList) {
+			int type = Integer.parseInt(getChildElementText(node, "Type"));
 			String desp=getChildElementText(node, "Desp");
 			if(desp.equals("正常结束")) {
-				end_id = getChildElementText(node, "Id");
-				break;
+				String end = getChildElementText(node, "Id");
+				end_id.add(end);
+			}else if(desp.equals("异常结束")) {
+				String end = getChildElementText(node, "Id");
+				exception_id.add(end);
 			}
 		}
 	}
@@ -122,11 +128,15 @@ public class BcptParser extends AbstractParser<BCModel> {
 		// Component/Implementation/Node/Id
 		idString = getChildElementText(node, "Id");
 		// Component/Implementation/Node/Desp
-		desc = getChildElementText(node, "Desp");
+		desc = getChildElementText(node, "Name");
 		int atIndex = desc.indexOf("@");
 		if (atIndex >= 0) {
 			desc = desc.substring(atIndex + 1);
 		}
+		if(desc.equals("取全局错误到容器")) {
+			return nodeModel;
+		}
+		
 		// Component/Implementation/Node/Target
 		target = getChildElementText(node, "Target");
 		nodeModel.setType(type);
@@ -157,9 +167,8 @@ public class BcptParser extends AbstractParser<BCModel> {
 		} else if (type == 7 || type == 12) {
 			LfcComponentElement lce = new LfcComponentElement();
 			if (type == 7) {
-				// Component/Implementation/Node/FilePath
-				String path = getChildElementText(node, "FilePath");
-				lce.setLfcPath(path.substring(path.lastIndexOf("/"), path.lastIndexOf(".")) + ".lfc");
+				// Component/Implementation/Node/FilePath 内嵌lfc的路径
+				lce.setLfcPath("/"+target.substring(target.lastIndexOf(".") + 1) + ".lfc");
 			}
 
 			List<Arg> cInArgs = getArgs(node, "In");
@@ -171,6 +180,7 @@ public class BcptParser extends AbstractParser<BCModel> {
 					}
 				}
 			}
+			lce.setMappingPath("/"+componentName+".lfc");
 			lce.addInArgs(getArgLfc(cInArgs));
 			nodeModel.setInputArgs(cInArgs);
 			// Component/OutArgs
@@ -243,16 +253,20 @@ public class BcptParser extends AbstractParser<BCModel> {
 							ComponentOut out = new ComponentOut();
 							out.setCaption(terminalDesc);
 							out.setName(terminalName);
-							if(targetNodeId.equals(end_id)) {
+							if (end_id != null && end_id.contains(targetNodeId)) {
 								out.setNext("1001");
-							}else {
+							} else if (exception_id != null && exception_id.contains(targetNodeId)) {
+								out.setNext("1000");
+							} else {
 								out.setNext(targetNodeId);
 							}
 							ce.addOut(out);
 						} else {
-							if(targetNodeId.equals(end_id)) {
+							if (end_id != null && end_id.contains(targetNodeId)) {
 								ce.getException().setNext("1001");
-							}else {
+							} else if (exception_id != null && exception_id.contains(targetNodeId)) {
+								ce.getException().setNext("1000");
+							} else {
 								ce.getException().setNext(targetNodeId);
 							}
 						}

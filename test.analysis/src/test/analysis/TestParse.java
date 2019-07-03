@@ -35,8 +35,10 @@ public class TestParse {
 //				System.out.println(JSON.toJSONString(bm));
 				String content = JSON.toJSONString(bp.getLfc());
 				System.out.println(content);
+				content = FormatUtil.formatJson(content);
 
-				File file3 = new File("./lfc/"+file2.getName().substring(0, file2.getName().lastIndexOf("."))+".lfc");
+//				File file3 = new File("./lfc/"+file2.getName().substring(0, file2.getName().lastIndexOf("."))+".lfc");
+				File file3 = new File("./lfc/"+bp.componentName+".lfc");
 				FileOutputStream fop = new FileOutputStream(file3);
 				if (!file3.exists()) {
 					file3.createNewFile();
