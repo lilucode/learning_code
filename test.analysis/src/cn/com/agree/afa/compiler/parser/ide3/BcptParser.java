@@ -3,8 +3,10 @@ package cn.com.agree.afa.compiler.parser.ide3;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -36,6 +38,10 @@ public class BcptParser extends AbstractParser<BCModel> {
 	private String target;
 	private List<String> end_id = new ArrayList<String>();
 	private List<String> exception_id = new ArrayList<String>();
+	private String default_id;
+	private String default_next_id;
+	private Map<String, String> change_id = new ConcurrentHashMap<String, String>();
+
 	public String componentName;
 
 	public LogicFlowControl getLfc() {
@@ -109,17 +115,51 @@ public class BcptParser extends AbstractParser<BCModel> {
 	public void changeEndId(Collection<Element> nodeList) throws XmlParseException {
 		for (Element node : nodeList) {
 			int type = Integer.parseInt(getChildElementText(node, "Type"));
-			String desp=getChildElementText(node, "Desp");
-			if(desp.equals("正常结束")) {
+			String desp = getChildElementText(node, "Desp");
+			if (type == 3) {
 				String end = getChildElementText(node, "Id");
 				end_id.add(end);
-			}else if(desp.equals("异常结束")) {
+			} else if (type == 4) {
 				String end = getChildElementText(node, "Id");
 				exception_id.add(end);
+			} else if (type == 6) {
+				// 默认逻辑错误委托
+				default_id = getChildElementText(node, "Id");
+				default_next_id = getNextId(node, "成功");
+			} else if (type == 10) {
+				// 中转节点
+				change_id.put("id", getChildElementText(node, "Id"));
+				change_id.put("next", getNextId(node, "锚点一"));
 			}
 		}
 	}
-	
+
+	public String getNextId(Element node, String desp) throws XmlParseException {
+		Element parallelTerminals = getDirectChildElement(node, "Terminals");
+		if (parallelTerminals != null) {
+			List<Element> terminals = getDirectChildElements(parallelTerminals, "Terminal");
+			for (Element terminalVariable : terminals) {
+				String terminalName = getChildElementText(terminalVariable, "Name");
+				String terminalDesc = getChildElementText(terminalVariable, "Desp");
+				Element sourceConnections = getDirectChildElement(
+						(Element) terminalVariable.getParentNode().getParentNode(), "SourceConnections");
+				if (sourceConnections == null) {
+					throw new XmlParseException("sourceConnections is null");
+				}
+				List<Element> connections = getDirectChildElements(sourceConnections, "Connection");
+				for (Element connection : connections) {
+					if (terminalName.equals(getChildElementText(connection, "SourceTerminal"))) {
+						String targetNodeId = getChildElementText(connection, "targetId");
+						if (terminalDesc.equals(desp)) {
+							return targetNodeId;
+						}
+					}
+				}
+			}
+		}
+		return null;
+	}
+
 	// 把ide右侧的node节点，转换成NodeModel
 	private NodeModel getNodeModel(Element node) throws XmlParseException {
 		NodeModel nodeModel = new NodeModel();
@@ -133,10 +173,10 @@ public class BcptParser extends AbstractParser<BCModel> {
 		if (atIndex >= 0) {
 			desc = desc.substring(atIndex + 1);
 		}
-		if(desc.equals("取全局错误到容器")) {
+		if (desc.equals("取全局错误到容器")) {
 			return nodeModel;
 		}
-		
+
 		// Component/Implementation/Node/Target
 		target = getChildElementText(node, "Target");
 		nodeModel.setType(type);
@@ -168,19 +208,13 @@ public class BcptParser extends AbstractParser<BCModel> {
 			LfcComponentElement lce = new LfcComponentElement();
 			if (type == 7) {
 				// Component/Implementation/Node/FilePath 内嵌lfc的路径
-				lce.setLfcPath("/"+target.substring(target.lastIndexOf(".") + 1) + ".lfc");
+				lce.setLfcPath("/" + target.substring(target.lastIndexOf(".") + 1) + ".lfc");
+			}else {
+				lce.setLfcPath("/" + desc + ".lfc");
 			}
 
 			List<Arg> cInArgs = getArgs(node, "In");
-			for (Arg componentArg : cInArgs) {
-				if (type == 12) {
-					if (componentArg.getKey().equals("tc")) {
-						// Component/Implementation/Node/InArgs/Arg/Key
-						lce.setLfcPath(componentArg.getArg());
-					}
-				}
-			}
-			lce.setMappingPath("/"+componentName+".lfc");
+			lce.setMappingPath("/" + componentName + ".lfc");
 			lce.addInArgs(getArgLfc(cInArgs));
 			nodeModel.setInputArgs(cInArgs);
 			// Component/OutArgs
@@ -192,14 +226,19 @@ public class BcptParser extends AbstractParser<BCModel> {
 			lfc.addLfc(lce);
 		}
 
-		if (desc.equals("开始")) {
+		if (type == 2) {
 			// Component/Implementation/Node/SourceConnections/Connection/targetId
 			String targetId = getChildElementText(
 					getDirectChildElement(getDirectChildElement(node, "SourceConnections"), "Connection"), "targetId");
 			nodeModel.setTargetId(targetId);
+			if (targetId.equals(default_id)) {
+				targetId = default_next_id;
+			} else if (targetId.equals(change_id.get("id"))) {
+				targetId = change_id.get("next");
+			}
 			lfc.setStart(Integer.valueOf(targetId));
 			setGeometry(lfc.getGeometry());
-		} else if (desc.equals("正常结束")) {
+		} else if (type == 3) {
 			// Component/Implementation/Node/Id
 			String endId = getChildElementText(node, "Id");
 			nodeModel.setEndId(endId);
@@ -318,12 +357,13 @@ public class BcptParser extends AbstractParser<BCModel> {
 			ae.setName(componentArg.getKey());
 			ae.setCaption(componentArg.getName());
 			ae.setDescription(componentArg.getType());
-			String arg_Value=componentArg.getArg();
-//			if (arg_Value.indexOf("\"") != -1) {
-//				ae.setValue(arg_Value.substring(arg_Value.indexOf("\"") + 1, arg_Value.lastIndexOf("\"")));
-//			} else {
-//				ae.setValue(arg_Value);
-//			}
+			String arg_Value = componentArg.getArg();
+			// if (arg_Value.indexOf("\"") != -1) {
+			// ae.setValue(arg_Value.substring(arg_Value.indexOf("\"") + 1,
+			// arg_Value.lastIndexOf("\"")));
+			// } else {
+			// ae.setValue(arg_Value);
+			// }
 			cInList.add(ae);
 		}
 		return cInList;
@@ -336,7 +376,7 @@ public class BcptParser extends AbstractParser<BCModel> {
 			ArgElement ae = new ArgElement();
 			ae.setName(componentArg.getKey());
 			ae.setType(componentArg.getType());
-			String arg_Value=componentArg.getArg();
+			String arg_Value = componentArg.getArg();
 			if (arg_Value.indexOf("\"") != -1) {
 				ae.setValue(arg_Value.substring(arg_Value.indexOf("\"") + 1, arg_Value.lastIndexOf("\"")));
 			} else {
