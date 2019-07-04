@@ -9,7 +9,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.alibaba.fastjson.annotation.JSONType;
+
 @SuppressWarnings("rawtypes")
+@JSONType(orders={"start","caption","geometry","fileDescription","dataBasket","inArgs","outArgs","internalVars","endstep","end","lfc","csd","component"})
 public class LogicFlowControl // implements IDncContainer
 {
 	private int start;
