@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2101 Alibaba Group.
+ * Copyright 1999-2018 Alibaba Group.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,66 +19,57 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 
 /**
- * @author wenshao<szujobs@hotmail.com>
+ * @author wenshao[szujobs@hotmail.com]
  */
 public class ArraySerializer implements ObjectSerializer {
 
+	private final Class<?> componentType;
     private final ObjectSerializer compObjectSerializer;
 
-    public ArraySerializer(ObjectSerializer compObjectSerializer){
-        super();
+    public ArraySerializer(Class<?> componentType, ObjectSerializer compObjectSerializer){
+        this.componentType = componentType;
         this.compObjectSerializer = compObjectSerializer;
     }
 
-    public final void write(JSONSerializer serializer, Object object, Object fieldName, Type fieldType)
+    public final void write(JSONSerializer serializer, Object object, Object fieldName, Type fieldType, int features)
                                                                                                        throws IOException {
-        SerializeWriter out = serializer.getWriter();
+        SerializeWriter out = serializer.out;
 
         if (object == null) {
-            if (out.isEnabled(SerializerFeature.WriteNullListAsEmpty)) {
-                out.write("[]");
-            } else {
-                out.writeNull();
-            }
+            out.writeNull(SerializerFeature.WriteNullListAsEmpty);
             return;
         }
 
         Object[] array = (Object[]) object;
         int size = array.length;
 
-        int end = size - 1;
-
-        if (end == -1) {
-            out.append("[]");
-            return;
-        }
-
-        SerialContext context = serializer.getContext();
-        serializer.setContext(context, object, fieldName);
+        SerialContext context = serializer.context;
+        serializer.setContext(context, object, fieldName, 0);
 
         try {
             out.append('[');
-            for (int i = 0; i < end; ++i) {
+            for (int i = 0; i < size; ++i) {
+            	if (i != 0) {
+            		out.append(',');
+            	}
                 Object item = array[i];
 
                 if (item == null) {
-                    out.append("null,");
+                    if (out.isEnabled(SerializerFeature.WriteNullStringAsEmpty) && object instanceof String[]) {
+                        out.writeString("");
+                    } else {
+                        out.append("null");
+                    }
+                } else if (item.getClass() == componentType) {
+                	compObjectSerializer.write(serializer, item, i, null, 0);
                 } else {
-                    compObjectSerializer.write(serializer, item, null, null);
-                    out.append(',');
+                	ObjectSerializer itemSerializer = serializer.getObjectWriter(item.getClass());
+                	itemSerializer.write(serializer, item, i, null, 0);
                 }
             }
-
-            Object item = array[end];
-
-            if (item == null) {
-                out.append("null]");
-            } else {
-                compObjectSerializer.write(serializer, item, null, null);
-                out.append(']');
-            }
+            out.append(']');
         } finally {
-            serializer.setContext(context);
+            serializer.context = context;
         }
     }
 }

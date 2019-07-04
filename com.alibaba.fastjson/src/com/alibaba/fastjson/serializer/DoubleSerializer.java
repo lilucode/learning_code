@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2101 Alibaba Group.
+ * Copyright 1999-2018 Alibaba Group.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,41 +17,48 @@ package com.alibaba.fastjson.serializer;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.text.DecimalFormat;
 
 /**
- * @author wenshao<szujobs@hotmail.com>
+ * @author wenshao[szujobs@hotmail.com]
  */
 public class DoubleSerializer implements ObjectSerializer {
 
-    public final static DoubleSerializer instance = new DoubleSerializer();
+    public final static DoubleSerializer instance      = new DoubleSerializer();
 
-    public void write(JSONSerializer serializer, Object object, Object fieldName, Type fieldType) throws IOException {
-        SerializeWriter out = serializer.getWriter();
+    private DecimalFormat                decimalFormat = null;
+
+    public DoubleSerializer(){
+
+    }
+
+    public DoubleSerializer(DecimalFormat decimalFormat){
+        this.decimalFormat = decimalFormat;
+    }
+
+    public DoubleSerializer(String decimalFormat){
+        this(new DecimalFormat(decimalFormat));
+    }
+
+    public void write(JSONSerializer serializer, Object object, Object fieldName, Type fieldType, int features) throws IOException {
+        SerializeWriter out = serializer.out;
 
         if (object == null) {
-            if (serializer.isEnabled(SerializerFeature.WriteNullNumberAsZero)) {
-                out.write('0');
-            } else {
-                out.writeNull();                
-            }
+            out.writeNull(SerializerFeature.WriteNullNumberAsZero);
             return;
         }
 
-        double doubleValue = ((Double) object).doubleValue(); 
-        
-        if (Double.isNaN(doubleValue)) {
-            out.writeNull();
-        } else if (Double.isInfinite(doubleValue)) {
+        double doubleValue = ((Double) object).doubleValue();
+
+        if (Double.isNaN(doubleValue) //
+                || Double.isInfinite(doubleValue)) {
             out.writeNull();
         } else {
-            String doubleText = Double.toString(doubleValue);
-            if (doubleText.endsWith(".0")) {
-                doubleText = doubleText.substring(0, doubleText.length() - 2);
-            }
-            out.append(doubleText);
-            
-            if (serializer.isEnabled(SerializerFeature.WriteClassName)) {
-                out.write('D');
+            if (decimalFormat == null) {
+                out.writeDouble(doubleValue, true);
+            } else {
+                String doubleText = decimalFormat.format(doubleValue);
+                out.write(doubleText);
             }
         }
     }

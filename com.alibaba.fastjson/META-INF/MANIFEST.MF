@@ -2,10 +2,9 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Fastjson
 Bundle-SymbolicName: com.alibaba.fastjson
-Bundle-Version: 1.1.15
+Bundle-Version: 1.2.58.v201906271117
 Bundle-Vendor: ALIBABA
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6,
- J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: com.alibaba.fastjson,
  com.alibaba.fastjson.annotation,
  com.alibaba.fastjson.asm,

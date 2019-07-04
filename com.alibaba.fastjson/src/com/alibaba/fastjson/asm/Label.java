@@ -38,24 +38,7 @@ package com.alibaba.fastjson.asm;
  * @author Eric Bruneton
  */
 public class Label {
-
-    /**
-     * Indicates if the position of this label is known.
-     */
-    static final int RESOLVED = 2;
-
-    /**
-     * Field used to associate user information to a label. Warning: this field is used by the ASM tree package. In
-     * order to use it with the ASM tree package you must override the
-     */
-    public Object    info;
-
     int              status;
-
-    /**
-     * The line number corresponding to this label, if known.
-     */
-    int              line;
 
     /**
      * The position of this label in the code, if known.
@@ -73,7 +56,7 @@ public class Label {
      * reference, while the second is the position of the first byte of the forward reference itself. In fact the sign
      * of the first integer indicates if this reference uses 2 or 4 bytes, and its absolute value gives the position of
      * the bytecode instruction. This array is also used as a bitset to store the subroutines to which a basic block
-     * belongs. This information is needed in {@linked MethodWriter#visitMaxs}, after all forward references have been
+     * belongs. This information is needed in MethodWriter#visitMaxs, after all forward references have been
      * resolved. Hence the same array can be used for both purposes without problems.
      */
     private int[]    srcAndRefPositions;
@@ -89,7 +72,7 @@ public class Label {
      * stack map frames are similar and use two steps. The first step, during the visit of each instruction, builds
      * information about the state of the local variables and the operand stack at the end of each basic block, called
      * the "output frame", <i>relatively</i> to the frame state at the beginning of the basic block, which is called the
-     * "input frame", and which is <i>unknown</i> during this step. The second step, in {@link MethodWriter#visitMaxs},
+     * "input frame", and which is <i>unknown</i> during this step. The second step, in link MethodWriter#visitMaxs,
      * is a fix point algorithm that computes information about the input frame of each basic block, from the input
      * state of the first basic block (known from the method signature), and by the using the previously computed
      * relative output frames. The algorithm used to compute the maximum stack size only computes the relative output
@@ -116,7 +99,7 @@ public class Label {
 
     /**
      * The successor of this label, in the order they are visited. This linked list does not include labels used for
-     * debug info only. If {@link ClassWriter#COMPUTE_FRAMES} option is used then, in addition, it does not contain
+     * debug info only. If ClassWriter#COMPUTE_FRAMES option is used then, in addition, it does not contain
      * successive labels that denote the same bytecode position (in this case only the first label appears in this
      * list).
      */
@@ -158,7 +141,7 @@ public class Label {
      * @throws IllegalArgumentException if this label has not been created by the given code writer.
      */
     void put(final MethodWriter owner, final ByteVector out, final int source) {
-        if ((status & RESOLVED) == 0) {
+        if ((status & 2 /* RESOLVED */ ) == 0) {
             addReference(source, out.length);
             out.putShort(-1);
         } else {
@@ -203,45 +186,18 @@ public class Label {
      * @throws IllegalArgumentException if this label has already been resolved, or if it has not been created by the
      * given code writer.
      */
-    boolean resolve(final MethodWriter owner, final int position, final byte[] data) {
-        boolean needUpdate = false;
-        this.status |= RESOLVED;
+    void resolve(final MethodWriter owner, final int position, final byte[] data) {
+        this.status |= 2 /* RESOLVED */ ;
         this.position = position;
         int i = 0;
         while (i < referenceCount) {
             int source = srcAndRefPositions[i++];
             int reference = srcAndRefPositions[i++];
-            int offset;
-            if (source >= 0) {
-                offset = position - source;
-                if (offset < Short.MIN_VALUE || offset > Short.MAX_VALUE) {
-                    /*
-                     * changes the opcode of the jump instruction, in order to be able to find it later (see
-                     * resizeInstructions in MethodWriter). These temporary opcodes are similar to jump instruction
-                     * opcodes, except that the 2 bytes offset is unsigned (and can therefore represent values from 0 to
-                     * 65535, which is sufficient since the size of a method is limited to 65535 bytes).
-                     */
-                    int opcode = data[reference - 1] & 0xFF;
-                    if (opcode <= Opcodes.JSR) {
-                        // changes IFEQ ... JSR to opcodes 202 to 217
-                        data[reference - 1] = (byte) (opcode + 49);
-                    } else {
-                        // changes IFNULL and IFNONNULL to opcodes 218 and 219
-                        data[reference - 1] = (byte) (opcode + 20);
-                    }
-                    needUpdate = true;
-                }
-                data[reference++] = (byte) (offset >>> 8);
-                data[reference] = (byte) offset;
-            } else {
-                offset = position + source + 1;
-                data[reference++] = (byte) (offset >>> 24);
-                data[reference++] = (byte) (offset >>> 16);
-                data[reference++] = (byte) (offset >>> 8);
-                data[reference] = (byte) offset;
-            }
+            int offset = position - source;
+            data[reference++] = (byte) (offset >>> 8);
+            data[reference] = (byte) offset;
+
         }
-        return needUpdate;
     }
 
 }

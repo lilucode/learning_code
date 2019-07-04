@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2101 Alibaba Group.
+ * Copyright 1999-2017 Alibaba Group.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,28 +29,29 @@ import static com.alibaba.fastjson.util.TypeUtils.castToSqlDate;
 import static com.alibaba.fastjson.util.TypeUtils.castToString;
 import static com.alibaba.fastjson.util.TypeUtils.castToTimestamp;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.RandomAccess;
+import java.util.*;
 
+import com.alibaba.fastjson.parser.ParserConfig;
 import com.alibaba.fastjson.util.TypeUtils;
 
 /**
- * @author wenshao<szujobs@hotmail.com>
+ * @author wenshao[szujobs@hotmail.com]
  */
-public class JSONArray extends JSON implements List<Object>, JSONAware, Cloneable, RandomAccess, Serializable {
+public class JSONArray extends JSON implements List<Object>, Cloneable, RandomAccess, Serializable {
 
     private static final long  serialVersionUID = 1L;
     private final List<Object> list;
+    protected transient Object relatedArray;
+    protected transient Type   componentType;
 
     public JSONArray(){
-        this.list = new ArrayList<Object>(10);
+        this.list = new ArrayList<Object>();
     }
 
     public JSONArray(List<Object> list){
@@ -59,6 +60,26 @@ public class JSONArray extends JSON implements List<Object>, JSONAware, Cloneabl
 
     public JSONArray(int initialCapacity){
         this.list = new ArrayList<Object>(initialCapacity);
+    }
+
+    /**
+     * @since 1.1.16
+     * @return
+     */
+    public Object getRelatedArray() {
+        return relatedArray;
+    }
+
+    public void setRelatedArray(Object relatedArray) {
+        this.relatedArray = relatedArray;
+    }
+
+    public Type getComponentType() {
+        return componentType;
+    }
+
+    public void setComponentType(Type componentType) {
+        this.componentType = componentType;
     }
 
     public int size() {
@@ -89,8 +110,18 @@ public class JSONArray extends JSON implements List<Object>, JSONAware, Cloneabl
         return list.add(e);
     }
 
+    public JSONArray fluentAdd(Object e) {
+        list.add(e);
+        return this;
+    }
+
     public boolean remove(Object o) {
         return list.remove(o);
+    }
+
+    public JSONArray fluentRemove(Object o) {
+        list.remove(o);
+        return this;
     }
 
     public boolean containsAll(Collection<?> c) {
@@ -101,32 +132,85 @@ public class JSONArray extends JSON implements List<Object>, JSONAware, Cloneabl
         return list.addAll(c);
     }
 
+    public JSONArray fluentAddAll(Collection<? extends Object> c) {
+        list.addAll(c);
+        return this;
+    }
+
     public boolean addAll(int index, Collection<? extends Object> c) {
         return list.addAll(index, c);
+    }
+
+    public JSONArray fluentAddAll(int index, Collection<? extends Object> c) {
+        list.addAll(index, c);
+        return this;
     }
 
     public boolean removeAll(Collection<?> c) {
         return list.removeAll(c);
     }
 
+    public JSONArray fluentRemoveAll(Collection<?> c) {
+        list.removeAll(c);
+        return this;
+    }
+
     public boolean retainAll(Collection<?> c) {
         return list.retainAll(c);
+    }
+
+    public JSONArray fluentRetainAll(Collection<?> c) {
+        list.retainAll(c);
+        return this;
     }
 
     public void clear() {
         list.clear();
     }
 
+    public JSONArray fluentClear() {
+        list.clear();
+        return this;
+    }
+
     public Object set(int index, Object element) {
+        if (index == -1) {
+            list.add(element);
+            return null;
+        }
+
+        if (list.size() <= index) {
+            for (int i = list.size(); i < index; ++i) {
+                list.add(null);
+            }
+            list.add(element);
+            return null;
+        }
+
         return list.set(index, element);
+    }
+
+    public JSONArray fluentSet(int index, Object element) {
+        set(index, element);
+        return this;
     }
 
     public void add(int index, Object element) {
         list.add(index, element);
     }
 
+    public JSONArray fluentAdd(int index, Object element) {
+        list.add(index, element);
+        return this;
+    }
+
     public Object remove(int index) {
         return list.remove(index);
+    }
+
+    public JSONArray fluentRemove(int index) {
+        list.remove(index);
+        return this;
     }
 
     public int indexOf(Object o) {
@@ -160,6 +244,10 @@ public class JSONArray extends JSON implements List<Object>, JSONAware, Cloneabl
             return (JSONObject) value;
         }
 
+        if (value instanceof Map) {
+            return new JSONObject((Map) value);
+        }
+
         return (JSONObject) toJSON(value);
     }
 
@@ -170,12 +258,26 @@ public class JSONArray extends JSON implements List<Object>, JSONAware, Cloneabl
             return (JSONArray) value;
         }
 
+        if (value instanceof List) {
+            return new JSONArray((List) value);
+        }
+
         return (JSONArray) toJSON(value);
     }
 
     public <T> T getObject(int index, Class<T> clazz) {
         Object obj = list.get(index);
         return TypeUtils.castToJavaBean(obj, clazz);
+    }
+
+    public <T> T getObject(int index, Type type) {
+        Object obj = list.get(index);
+        if (type instanceof Class) {
+            return (T) TypeUtils.castToJavaBean(obj, (Class) type);
+        } else {
+            String json = JSON.toJSONString(obj);
+            return (T) JSON.parseObject(json, type);
+        }
     }
 
     public Boolean getBoolean(int index) {
@@ -207,11 +309,12 @@ public class JSONArray extends JSON implements List<Object>, JSONAware, Cloneabl
     public byte getByteValue(int index) {
         Object value = get(index);
 
-        if (value == null) {
+        Byte byteVal = castToByte(value);
+        if (byteVal == null) {
             return 0;
         }
 
-        return castToByte(value).byteValue();
+        return byteVal.byteValue();
     }
 
     public Short getShort(int index) {
@@ -223,11 +326,12 @@ public class JSONArray extends JSON implements List<Object>, JSONAware, Cloneabl
     public short getShortValue(int index) {
         Object value = get(index);
 
-        if (value == null) {
+        Short shortVal = castToShort(value);
+        if (shortVal == null) {
             return 0;
         }
 
-        return castToShort(value).shortValue();
+        return shortVal.shortValue();
     }
 
     public Integer getInteger(int index) {
@@ -239,11 +343,12 @@ public class JSONArray extends JSON implements List<Object>, JSONAware, Cloneabl
     public int getIntValue(int index) {
         Object value = get(index);
 
-        if (value == null) {
+        Integer intVal = castToInt(value);
+        if (intVal == null) {
             return 0;
         }
 
-        return castToInt(value).intValue();
+        return intVal.intValue();
     }
 
     public Long getLong(int index) {
@@ -255,11 +360,12 @@ public class JSONArray extends JSON implements List<Object>, JSONAware, Cloneabl
     public long getLongValue(int index) {
         Object value = get(index);
 
-        if (value == null) {
+        Long longVal = castToLong(value);
+        if (longVal == null) {
             return 0L;
         }
 
-        return castToLong(value).longValue();
+        return longVal.longValue();
     }
 
     public Float getFloat(int index) {
@@ -271,11 +377,12 @@ public class JSONArray extends JSON implements List<Object>, JSONAware, Cloneabl
     public float getFloatValue(int index) {
         Object value = get(index);
 
-        if (value == null) {
+        Float floatValue = castToFloat(value);
+        if (floatValue == null) {
             return 0F;
         }
 
-        return castToFloat(value).floatValue();
+        return floatValue.floatValue();
     }
 
     public Double getDouble(int index) {
@@ -287,11 +394,12 @@ public class JSONArray extends JSON implements List<Object>, JSONAware, Cloneabl
     public double getDoubleValue(int index) {
         Object value = get(index);
 
-        if (value == null) {
+        Double doubleValue = castToDouble(value);
+        if (doubleValue == null) {
             return 0D;
         }
 
-        return castToDouble(value).floatValue();
+        return doubleValue.doubleValue();
     }
 
     public BigDecimal getBigDecimal(int index) {
@@ -330,16 +438,52 @@ public class JSONArray extends JSON implements List<Object>, JSONAware, Cloneabl
         return castToTimestamp(value);
     }
 
+    /**
+     * @since  1.2.23
+     */
+    public <T> List<T> toJavaList(Class<T> clazz) {
+        List<T> list = new ArrayList<T>(this.size());
+
+        ParserConfig config = ParserConfig.getGlobalInstance();
+
+        for (Object item : this) {
+            T classItem = (T) TypeUtils.cast(item, clazz, config);
+            list.add(classItem);
+        }
+
+        return list;
+    }
+
     @Override
     public Object clone() {
         return new JSONArray(new ArrayList<Object>(list));
     }
-    
+
     public boolean equals(Object obj) {
         return this.list.equals(obj);
     }
-    
+
     public int hashCode() {
         return this.list.hashCode();
+    }
+
+    private void readObject(final java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        JSONObject.SecureObjectInputStream.ensureFields();
+        if (JSONObject.SecureObjectInputStream.fields != null && !JSONObject.SecureObjectInputStream.fields_error) {
+            ObjectInputStream secIn = new JSONObject.SecureObjectInputStream(in);
+            try {
+                secIn.defaultReadObject();
+                return;
+            } catch (java.io.NotActiveException e) {
+                // skip
+            }
+        }
+
+        in.defaultReadObject();
+        for (Object item : list) {
+            if (item != null) {
+                ParserConfig.global.checkAutoType(item.getClass().getName(), null);
+            }
+        }
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2101 Alibaba Group.
+ * Copyright 1999-2018 Alibaba Group.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,13 @@
 package com.alibaba.fastjson.serializer;
 
 import java.io.File;
+import java.io.Serializable;
+import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -27,7 +33,19 @@ import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Currency;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -38,114 +56,735 @@ import java.util.concurrent.atomic.AtomicLongArray;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 
+import javax.xml.datatype.XMLGregorianCalendar;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONAware;
 import com.alibaba.fastjson.JSONException;
-import com.alibaba.fastjson.util.ASMClassLoader;
+import com.alibaba.fastjson.JSONStreamAware;
+import com.alibaba.fastjson.PropertyNamingStrategy;
+import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson.annotation.JSONType;
+import com.alibaba.fastjson.parser.deserializer.Jdk8DateCodec;
+import com.alibaba.fastjson.parser.deserializer.OptionalCodec;
+import com.alibaba.fastjson.spi.Module;
 import com.alibaba.fastjson.util.ASMUtils;
+import com.alibaba.fastjson.util.FieldInfo;
 import com.alibaba.fastjson.util.IdentityHashMap;
+import com.alibaba.fastjson.util.ServiceLoader;
+import com.alibaba.fastjson.util.TypeUtils;
 
 /**
  * circular references detect
  * 
- * @author wenshao<szujobs@hotmail.com>
+ * @author wenshao[szujobs@hotmail.com]
  */
-public class SerializeConfig extends IdentityHashMap<Type, ObjectSerializer> {
+public class SerializeConfig {
 
-    private final static SerializeConfig globalInstance = new SerializeConfig();
+    public final static SerializeConfig                   globalInstance  = new SerializeConfig();
 
-    private boolean                      asm            = !ASMUtils.isAndroid();      ;
+    private static boolean                                awtError        = false;
+    private static boolean                                jdk8Error       = false;
+    private static boolean                                oracleJdbcError = false;
+    private static boolean                                springfoxError  = false;
+    private static boolean                                jsonnullError   = false;
 
-    private final ASMSerializerFactory   asmFactory     = new ASMSerializerFactory();
 
-    public final ObjectSerializer createASMSerializer(Class<?> clazz) throws Exception {
-        return asmFactory.createJavaBeanSerializer(clazz);
+    private boolean                                       asm             = !ASMUtils.IS_ANDROID;
+    private ASMSerializerFactory                          asmFactory;
+    protected String                                      typeKey         = JSON.DEFAULT_TYPE_KEY;
+    public PropertyNamingStrategy                         propertyNamingStrategy;
+
+    private final IdentityHashMap<Type, ObjectSerializer> serializers;
+
+    private final boolean                                 fieldBased;
+
+    private long[]                                        denyClasses =
+            {
+                    4165360493669296979L,
+                    4446674157046724083L
+            };
+
+    private List<Module>                                    modules                = new ArrayList<Module>();
+    
+	public String getTypeKey() {
+		return typeKey;
+	}
+
+	public void setTypeKey(String typeKey) {
+		this.typeKey = typeKey;
+	}
+	
+    private final JavaBeanSerializer createASMSerializer(SerializeBeanInfo beanInfo) throws Exception {
+        JavaBeanSerializer serializer = asmFactory.createJavaBeanSerializer(beanInfo);
+        
+        for (int i = 0; i < serializer.sortedGetters.length; ++i) {
+            FieldSerializer fieldDeser = serializer.sortedGetters[i];
+            Class<?> fieldClass = fieldDeser.fieldInfo.fieldClass;
+            if (fieldClass.isEnum()) {
+                ObjectSerializer fieldSer = this.getObjectWriter(fieldClass);
+                if (!(fieldSer instanceof EnumSerializer)) {
+                    serializer.writeDirect = false;
+                }
+            }
+        }
+     
+        return serializer;
     }
 
-    public ObjectSerializer createJavaBeanSerializer(Class<?> clazz) {
-        if (!Modifier.isPublic(clazz.getModifiers())) {
-            return new JavaBeanSerializer(clazz);
+    public final ObjectSerializer createJavaBeanSerializer(Class<?> clazz) {
+        String className = clazz.getName();
+        long hashCode64 = TypeUtils.fnv1a_64(className);
+	    if (Arrays.binarySearch(denyClasses, hashCode64) >= 0) {
+	        throw new JSONException("not support class : " + className);
         }
-        
-        boolean asm = this.asm;
-        
-        if (asm && ASMClassLoader.isExternalClass(clazz)) {
-            asm = false;
-        }
-        if (asm) {
-            try {
-                return createASMSerializer(clazz);
-            } catch (Throwable e) {
-                throw new JSONException("create asm serilizer error, class " + clazz, e);
+
+	    SerializeBeanInfo beanInfo = TypeUtils.buildBeanInfo(clazz, null, propertyNamingStrategy, fieldBased);
+	    if (beanInfo.fields.length == 0 && Iterable.class.isAssignableFrom(clazz)) {
+	        return MiscCodec.instance;
+	    }
+
+	    return createJavaBeanSerializer(beanInfo);
+	}
+	
+	public ObjectSerializer createJavaBeanSerializer(SerializeBeanInfo beanInfo) {
+	    JSONType jsonType = beanInfo.jsonType;
+
+        boolean asm = this.asm && !fieldBased;
+	    
+	    if (jsonType != null) {
+	        Class<?> serializerClass = jsonType.serializer();
+	        if (serializerClass != Void.class) {
+	            try {
+                    Object seralizer = serializerClass.newInstance();
+                    if (seralizer instanceof ObjectSerializer) {
+                        return (ObjectSerializer) seralizer;
+                    }
+                } catch (Throwable e) {
+                    // skip
+                }
+	        }
+	        
+	        if (jsonType.asm() == false) {
+	            asm = false;
+	        }
+
+	        if (asm) {
+                for (SerializerFeature feature : jsonType.serialzeFeatures()) {
+                    if (SerializerFeature.WriteNonStringValueAsString == feature //
+                            || SerializerFeature.WriteEnumUsingToString == feature //
+                            || SerializerFeature.NotWriteDefaultValue == feature
+                            || SerializerFeature.BrowserCompatible == feature) {
+                        asm = false;
+                        break;
+                    }
+                }
+            }
+
+            if (asm) {
+                final Class<? extends SerializeFilter>[] filterClasses = jsonType.serialzeFilters();
+                if (filterClasses.length != 0) {
+                    asm = false;
+                }
             }
         }
 
-        return new JavaBeanSerializer(clazz);
+	    Class<?> clazz = beanInfo.beanType;
+		if (!Modifier.isPublic(beanInfo.beanType.getModifiers())) {
+			return new JavaBeanSerializer(beanInfo);
+		}
+
+
+
+		if (asm && asmFactory.classLoader.isExternalClass(clazz)
+				|| clazz == Serializable.class || clazz == Object.class) {
+			asm = false;
+		}
+
+		if (asm && !ASMUtils.checkName(clazz.getSimpleName())) {
+		    asm = false;
+		}
+
+		if (asm && beanInfo.beanType.isInterface()) {
+		    asm = false;
+        }
+		
+		if (asm) {
+    		for(FieldInfo fieldInfo : beanInfo.fields){
+                Field field = fieldInfo.field;
+                if (field != null && !field.getType().equals(fieldInfo.fieldClass)) {
+                    asm = false;
+                    break;
+                }
+
+                Method method = fieldInfo.method;
+                if (method != null && !method.getReturnType().equals(fieldInfo.fieldClass)) {
+                    asm = false;
+                    break;
+                }
+
+    			JSONField annotation = fieldInfo.getAnnotation();
+    			
+    			if (annotation == null) {
+    			    continue;
+    			}
+
+    			String format = annotation.format();
+    			if (format.length() != 0) {
+    			    if (fieldInfo.fieldClass == String.class && "trim".equals(format)) {
+
+                    } else {
+                        asm = false;
+                        break;
+                    }
+                }
+
+                if ((!ASMUtils.checkName(annotation.name())) //
+                        || annotation.jsonDirect()
+                        || annotation.serializeUsing() != Void.class
+                        || annotation.unwrapped()
+                        ) {
+    				asm = false;
+    				break;
+    			}
+
+                for (SerializerFeature feature : annotation.serialzeFeatures()) {
+                    if (SerializerFeature.WriteNonStringValueAsString == feature //
+                            || SerializerFeature.WriteEnumUsingToString == feature //
+                            || SerializerFeature.NotWriteDefaultValue == feature
+                            || SerializerFeature.BrowserCompatible == feature
+                            || SerializerFeature.WriteClassName == feature) {
+                        asm = false;
+                        break;
+                    }
+                }
+
+                if (TypeUtils.isAnnotationPresentOneToMany(method) || TypeUtils.isAnnotationPresentManyToMany(method)) {
+    			    asm = false;
+    			    break;
+                }
+    		}
+		}
+		
+		if (asm) {
+			try {
+                ObjectSerializer asmSerializer = createASMSerializer(beanInfo);
+                if (asmSerializer != null) {
+                    return asmSerializer;
+                }
+            } catch (ClassNotFoundException ex) {
+			    // skip
+			} catch (ClassFormatError e) {
+			    // skip
+			} catch (ClassCastException e) {
+			    // skip
+            } catch (OutOfMemoryError e) {
+			    if (e.getMessage().indexOf("Metaspace") != -1) {
+			        throw e;
+                }
+                // skip
+			} catch (Throwable e) {
+				throw new JSONException("create asm serializer error, verson " + JSON.VERSION + ", class " + clazz, e);
+			}
+		}
+
+		return new JavaBeanSerializer(beanInfo);
+	}
+
+	public boolean isAsmEnable() {
+		return asm;
+	}
+
+	public void setAsmEnable(boolean asmEnable) {
+	    if (ASMUtils.IS_ANDROID) {
+	        return;
+	    }
+		this.asm = asmEnable;
+	}
+
+	public static SerializeConfig getGlobalInstance() {
+		return globalInstance;
+	}
+
+	public SerializeConfig() {
+		this(IdentityHashMap.DEFAULT_SIZE);
+	}
+
+    public SerializeConfig(boolean fieldBase) {
+	    this(IdentityHashMap.DEFAULT_SIZE, fieldBase);
     }
 
-    public boolean isAsmEnable() {
-        return asm;
+    public SerializeConfig(int tableSize) {
+        this(tableSize, false);
     }
 
-    public void setAsmEnable(boolean asmEnable) {
-        this.asm = asmEnable;
-    }
+	public SerializeConfig(int tableSize, boolean fieldBase) {
+	    this.fieldBased = fieldBase;
+	    serializers = new IdentityHashMap<Type, ObjectSerializer>(tableSize);
+		
+		try {
+		    if (asm) {
+		        asmFactory = new ASMSerializerFactory();
+		    }
+		} catch (Throwable eror) {
+		    asm = false;
+		}
 
-    public final static SerializeConfig getGlobalInstance() {
-        return globalInstance;
-    }
+        initSerializers();
+	}
 
-    public SerializeConfig(){
-        this(DEFAULT_TABLE_SIZE);
-    }
-
-    public SerializeConfig(int tableSize){
-        super(tableSize);
-
-        put(Boolean.class, BooleanSerializer.instance);
-        put(Character.class, CharacterSerializer.instance);
-        put(Byte.class, ByteSerializer.instance);
-        put(Short.class, ShortSerializer.instance);
-        put(Integer.class, IntegerSerializer.instance);
-        put(Long.class, LongSerializer.instance);
-        put(Float.class, FloatSerializer.instance);
+    private void initSerializers() {
+        put(Boolean.class, BooleanCodec.instance);
+        put(Character.class, CharacterCodec.instance);
+        put(Byte.class, IntegerCodec.instance);
+        put(Short.class, IntegerCodec.instance);
+        put(Integer.class, IntegerCodec.instance);
+        put(Long.class, LongCodec.instance);
+        put(Float.class, FloatCodec.instance);
         put(Double.class, DoubleSerializer.instance);
-        put(BigDecimal.class, BigDecimalSerializer.instance);
-        put(BigInteger.class, BigIntegerSerializer.instance);
-        put(String.class, StringSerializer.instance);
-        put(byte[].class, ByteArraySerializer.instance);
-        put(short[].class, ShortArraySerializer.instance);
-        put(int[].class, IntArraySerializer.instance);
-        put(long[].class, LongArraySerializer.instance);
-        put(float[].class, FloatArraySerializer.instance);
-        put(double[].class, DoubleArraySerializer.instance);
-        put(boolean[].class, BooleanArraySerializer.instance);
-        put(char[].class, CharArraySerializer.instance);
-        put(Object[].class, ObjectArraySerializer.instance);
-        put(Class.class, ClassSerializer.instance);
+        put(BigDecimal.class, BigDecimalCodec.instance);
+        put(BigInteger.class, BigIntegerCodec.instance);
+        put(String.class, StringCodec.instance);
+        put(byte[].class, PrimitiveArraySerializer.instance);
+        put(short[].class, PrimitiveArraySerializer.instance);
+        put(int[].class, PrimitiveArraySerializer.instance);
+        put(long[].class, PrimitiveArraySerializer.instance);
+        put(float[].class, PrimitiveArraySerializer.instance);
+        put(double[].class, PrimitiveArraySerializer.instance);
+        put(boolean[].class, PrimitiveArraySerializer.instance);
+        put(char[].class, PrimitiveArraySerializer.instance);
+        put(Object[].class, ObjectArrayCodec.instance);
+        put(Class.class, MiscCodec.instance);
 
-        put(Locale.class, LocaleSerializer.instance);
-        put(TimeZone.class, TimeZoneSerializer.instance);
-        put(UUID.class, UUIDSerializer.instance);
-        put(InetAddress.class, InetAddressSerializer.instance);
-        put(Inet4Address.class, InetAddressSerializer.instance);
-        put(Inet6Address.class, InetAddressSerializer.instance);
-        put(InetSocketAddress.class, InetSocketAddressSerializer.instance);
-        put(File.class, FileSerializer.instance);
-        put(URI.class, URISerializer.instance);
-        put(URL.class, URLSerializer.instance);
+        put(SimpleDateFormat.class, MiscCodec.instance);
+        put(Currency.class, new MiscCodec());
+        put(TimeZone.class, MiscCodec.instance);
+        put(InetAddress.class, MiscCodec.instance);
+        put(Inet4Address.class, MiscCodec.instance);
+        put(Inet6Address.class, MiscCodec.instance);
+        put(InetSocketAddress.class, MiscCodec.instance);
+        put(File.class, MiscCodec.instance);
         put(Appendable.class, AppendableSerializer.instance);
         put(StringBuffer.class, AppendableSerializer.instance);
         put(StringBuilder.class, AppendableSerializer.instance);
-        put(Pattern.class, PatternSerializer.instance);
-        put(Charset.class, CharsetSerializer.instance);
+        put(Charset.class, ToStringSerializer.instance);
+        put(Pattern.class, ToStringSerializer.instance);
+        put(Locale.class, ToStringSerializer.instance);
+        put(URI.class, ToStringSerializer.instance);
+        put(URL.class, ToStringSerializer.instance);
+        put(UUID.class, ToStringSerializer.instance);
 
         // atomic
-        put(AtomicBoolean.class, AtomicBooleanSerializer.instance);
-        put(AtomicInteger.class, AtomicIntegerSerializer.instance);
-        put(AtomicLong.class, AtomicLongSerializer.instance);
-        put(AtomicReference.class, AtomicReferenceSerializer.instance);
-        put(AtomicIntegerArray.class, AtomicIntegerArraySerializer.instance);
-        put(AtomicLongArray.class, AtomicLongArraySerializer.instance);
+        put(AtomicBoolean.class, AtomicCodec.instance);
+        put(AtomicInteger.class, AtomicCodec.instance);
+        put(AtomicLong.class, AtomicCodec.instance);
+        put(AtomicReference.class, ReferenceCodec.instance);
+        put(AtomicIntegerArray.class, AtomicCodec.instance);
+        put(AtomicLongArray.class, AtomicCodec.instance);
 
+        put(WeakReference.class, ReferenceCodec.instance);
+        put(SoftReference.class, ReferenceCodec.instance);
+
+        put(LinkedList.class, CollectionCodec.instance);
     }
 
+    /**
+	 * add class level serialize filter
+	 * @since 1.2.10
+	 */
+	public void addFilter(Class<?> clazz, SerializeFilter filter) {
+	    ObjectSerializer serializer = getObjectWriter(clazz);
+	    
+	    if (serializer instanceof SerializeFilterable) {
+	        SerializeFilterable filterable = (SerializeFilterable) serializer;
+	        
+	        if (this != SerializeConfig.globalInstance) {
+	            if (filterable == MapSerializer.instance) {
+	                MapSerializer newMapSer = new MapSerializer();
+	                this.put(clazz, newMapSer);
+	                newMapSer.addFilter(filter);
+	                return;
+	            }
+	        }
+	        
+	        filterable.addFilter(filter);
+	    }
+	}
+	
+    /** class level serializer feature config
+     * @since 1.2.12
+     */
+    public void config(Class<?> clazz, SerializerFeature feature, boolean value) {
+        ObjectSerializer serializer = getObjectWriter(clazz, false);
+        
+        if (serializer == null) {
+            SerializeBeanInfo beanInfo = TypeUtils.buildBeanInfo(clazz, null, propertyNamingStrategy);
+            
+            if (value) {
+                beanInfo.features |= feature.mask;
+            } else {
+                beanInfo.features &= ~feature.mask;
+            }
+            
+            serializer = this.createJavaBeanSerializer(beanInfo);
+            
+            put(clazz, serializer);
+            return;
+        }
+
+        if (serializer instanceof JavaBeanSerializer) {
+            JavaBeanSerializer javaBeanSerializer = (JavaBeanSerializer) serializer;
+            SerializeBeanInfo beanInfo = javaBeanSerializer.beanInfo;
+            
+            int originalFeaturs = beanInfo.features;
+            if (value) {
+                beanInfo.features |= feature.mask;
+            } else {
+                beanInfo.features &= ~feature.mask;
+            }
+            
+            if (originalFeaturs == beanInfo.features) {
+                return;
+            }
+            
+            Class<?> serializerClass = serializer.getClass();
+            if (serializerClass != JavaBeanSerializer.class) {
+                ObjectSerializer newSerializer = this.createJavaBeanSerializer(beanInfo);
+                this.put(clazz, newSerializer);
+            }
+        }
+    }
+    
+    public ObjectSerializer getObjectWriter(Class<?> clazz) {
+        return getObjectWriter(clazz, true);
+    }
+	
+	private ObjectSerializer getObjectWriter(Class<?> clazz, boolean create) {
+        ObjectSerializer writer = serializers.get(clazz);
+
+        if (writer == null) {
+            try {
+                final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+                for (Object o : ServiceLoader.load(AutowiredObjectSerializer.class, classLoader)) {
+                    if (!(o instanceof AutowiredObjectSerializer)) {
+                        continue;
+                    }
+
+                    AutowiredObjectSerializer autowired = (AutowiredObjectSerializer) o;
+                    for (Type forType : autowired.getAutowiredFor()) {
+                        put(forType, autowired);
+                    }
+                }
+            } catch (ClassCastException ex) {
+                // skip
+            }
+
+            writer = serializers.get(clazz);
+        }
+
+        if (writer == null) {
+            final ClassLoader classLoader = JSON.class.getClassLoader();
+            if (classLoader != Thread.currentThread().getContextClassLoader()) {
+                try {
+                    for (Object o : ServiceLoader.load(AutowiredObjectSerializer.class, classLoader)) {
+
+                        if (!(o instanceof AutowiredObjectSerializer)) {
+                            continue;
+                        }
+
+                        AutowiredObjectSerializer autowired = (AutowiredObjectSerializer) o;
+                        for (Type forType : autowired.getAutowiredFor()) {
+                            put(forType, autowired);
+                        }
+                    }
+                } catch (ClassCastException ex) {
+                    // skip
+                }
+
+                writer = serializers.get(clazz);
+            }
+        }
+
+        for (Module module : modules) {
+            writer = module.createSerializer(this, clazz);
+            if (writer != null) {
+                serializers.put(clazz, writer);
+                return writer;
+            }
+        }
+        
+        if (writer == null) {
+            String className = clazz.getName();
+            Class<?> superClass;
+
+            if (Map.class.isAssignableFrom(clazz)) {
+                put(clazz, writer = MapSerializer.instance);
+            } else if (List.class.isAssignableFrom(clazz)) {
+                put(clazz, writer = ListSerializer.instance);
+            } else if (Collection.class.isAssignableFrom(clazz)) {
+                put(clazz, writer = CollectionCodec.instance);
+            } else if (Date.class.isAssignableFrom(clazz)) {
+                put(clazz, writer = DateCodec.instance);
+            } else if (JSONAware.class.isAssignableFrom(clazz)) {
+                put(clazz, writer = JSONAwareSerializer.instance);
+            } else if (JSONSerializable.class.isAssignableFrom(clazz)) {
+                put(clazz, writer = JSONSerializableSerializer.instance);
+            } else if (JSONStreamAware.class.isAssignableFrom(clazz)) {
+                put(clazz, writer = MiscCodec.instance);
+            } else if (clazz.isEnum()) {
+                JSONType jsonType = TypeUtils.getAnnotation(clazz, JSONType.class);
+                if (jsonType != null && jsonType.serializeEnumAsJavaBean()) {
+                    put(clazz, writer = createJavaBeanSerializer(clazz));
+                } else {
+                    put(clazz, writer = EnumSerializer.instance);
+                }
+            } else if ((superClass = clazz.getSuperclass()) != null && superClass.isEnum()) {
+                JSONType jsonType = TypeUtils.getAnnotation(superClass, JSONType.class);
+                if (jsonType != null && jsonType.serializeEnumAsJavaBean()) {
+                    put(clazz, writer = createJavaBeanSerializer(clazz));
+                } else {
+                    put(clazz, writer = EnumSerializer.instance);
+                }
+            } else if (clazz.isArray()) {
+                Class<?> componentType = clazz.getComponentType();
+                ObjectSerializer compObjectSerializer = getObjectWriter(componentType);
+                put(clazz, writer = new ArraySerializer(componentType, compObjectSerializer));
+            } else if (Throwable.class.isAssignableFrom(clazz)) {
+                SerializeBeanInfo beanInfo = TypeUtils.buildBeanInfo(clazz, null, propertyNamingStrategy);
+                beanInfo.features |= SerializerFeature.WriteClassName.mask;
+                put(clazz, writer = new JavaBeanSerializer(beanInfo));
+            } else if (TimeZone.class.isAssignableFrom(clazz) || Map.Entry.class.isAssignableFrom(clazz)) {
+                put(clazz, writer = MiscCodec.instance);
+            } else if (Appendable.class.isAssignableFrom(clazz)) {
+                put(clazz, writer = AppendableSerializer.instance);
+            } else if (Charset.class.isAssignableFrom(clazz)) {
+                put(clazz, writer = ToStringSerializer.instance);
+            } else if (Enumeration.class.isAssignableFrom(clazz)) {
+                put(clazz, writer = EnumerationSerializer.instance);
+            } else if (Calendar.class.isAssignableFrom(clazz) //
+                    || XMLGregorianCalendar.class.isAssignableFrom(clazz)) {
+                put(clazz, writer = CalendarCodec.instance);
+            } else if (TypeUtils.isClob(clazz)) {
+                put(clazz, writer = ClobSeriliazer.instance);
+            } else if (TypeUtils.isPath(clazz)) {
+                put(clazz, writer = ToStringSerializer.instance);
+            } else if (Iterator.class.isAssignableFrom(clazz)) {
+                put(clazz, writer = MiscCodec.instance);
+            } else if (org.w3c.dom.Node.class.isAssignableFrom(clazz)) {
+                put(clazz, writer = MiscCodec.instance);
+            } else {
+                if (className.startsWith("java.awt.") //
+                    && AwtCodec.support(clazz) //
+                ) {
+                    // awt
+                    if (!awtError) {
+                        try {
+                            String[] names = new String[]{
+                                    "java.awt.Color",
+                                    "java.awt.Font",
+                                    "java.awt.Point",
+                                    "java.awt.Rectangle"
+                            };
+                            for (String name : names) {
+                                if (name.equals(className)) {
+                                    put(Class.forName(name), writer = AwtCodec.instance);
+                                    return writer;
+                                }
+                            }
+                        } catch (Throwable e) {
+                            awtError = true;
+                            // skip
+                        }
+                    }
+                }
+                
+                // jdk8
+                if ((!jdk8Error) //
+                    && (className.startsWith("java.time.") //
+                        || className.startsWith("java.util.Optional") //
+                        || className.equals("java.util.concurrent.atomic.LongAdder")
+                        || className.equals("java.util.concurrent.atomic.DoubleAdder")
+                    )) {
+                    try {
+                        {
+                            String[] names = new String[]{
+                                    "java.time.LocalDateTime",
+                                    "java.time.LocalDate",
+                                    "java.time.LocalTime",
+                                    "java.time.ZonedDateTime",
+                                    "java.time.OffsetDateTime",
+                                    "java.time.OffsetTime",
+                                    "java.time.ZoneOffset",
+                                    "java.time.ZoneRegion",
+                                    "java.time.Period",
+                                    "java.time.Duration",
+                                    "java.time.Instant"
+                            };
+                            for (String name : names) {
+                                if (name.equals(className)) {
+                                    put(Class.forName(name), writer = Jdk8DateCodec.instance);
+                                    return writer;
+                                }
+                            }
+                        }
+                        {
+                            String[] names = new String[]{
+                                    "java.util.Optional",
+                                    "java.util.OptionalDouble",
+                                    "java.util.OptionalInt",
+                                    "java.util.OptionalLong"
+                            };
+                            for (String name : names) {
+                                if (name.equals(className)) {
+                                    put(Class.forName(name), writer = OptionalCodec.instance);
+                                    return writer;
+                                }
+                            }
+                        }
+                        {
+                            String[] names = new String[]{
+                                    "java.util.concurrent.atomic.LongAdder",
+                                    "java.util.concurrent.atomic.DoubleAdder"
+                            };
+                            for (String name : names) {
+                                if (name.equals(className)) {
+                                    put(Class.forName(name), writer = AdderSerializer.instance);
+                                    return writer;
+                                }
+                            }
+                        }
+                    } catch (Throwable e) {
+                        // skip
+                        jdk8Error = true;
+                    }
+                }
+                
+                if ((!oracleJdbcError) //
+                    && className.startsWith("oracle.sql.")) {
+                    try {
+                        String[] names = new String[] {
+                                "oracle.sql.DATE",
+                                "oracle.sql.TIMESTAMP"
+                        };
+
+                        for (String name : names) {
+                            if (name.equals(className)) {
+                                put(Class.forName(name), writer = DateCodec.instance);
+                                return writer;
+                            }
+                        }
+                    } catch (Throwable e) {
+                        // skip
+                        oracleJdbcError = true;
+                    }
+                }
+                
+
+                if ((!jsonnullError) && className.equals("net.sf.json.JSONNull")) {
+                    try {
+                        put(Class.forName("net.sf.json.JSONNull"), writer = MiscCodec.instance);
+                        return writer;
+                    } catch (ClassNotFoundException e) {
+                        // skip
+                        jsonnullError = true;
+                    }
+                }
+
+
+                if ("java.nio.HeapByteBuffer".equals(className)) {
+                    put(clazz, writer = ByteBufferCodec.instance);
+                    return writer;
+                }
+
+
+                Class[] interfaces = clazz.getInterfaces();
+                if (interfaces.length == 1 && interfaces[0].isAnnotation()) {
+                    put(clazz, AnnotationSerializer.instance);
+                    return AnnotationSerializer.instance;
+                }
+
+                if (TypeUtils.isProxy(clazz)) {
+                    Class<?> superClazz = clazz.getSuperclass();
+
+                    ObjectSerializer superWriter = getObjectWriter(superClazz);
+                    put(clazz, superWriter);
+                    return superWriter;
+                }
+
+                if (Proxy.isProxyClass(clazz)) {
+                    Class handlerClass = null;
+
+                    if (interfaces.length == 2) {
+                        handlerClass = interfaces[1];
+                    } else {
+                        for (Class proxiedInterface : interfaces) {
+                            if (proxiedInterface.getName().startsWith("org.springframework.aop.")) {
+                                continue;
+                            }
+                            if (handlerClass != null) {
+                                handlerClass = null; // multi-matched
+                                break;
+                            }
+                            handlerClass = proxiedInterface;
+                        }
+                    }
+
+                    if (handlerClass != null) {
+                        ObjectSerializer superWriter = getObjectWriter(handlerClass);
+                        put(clazz, superWriter);
+                        return superWriter;
+                    }
+                }
+
+                if (create) {
+                    writer = createJavaBeanSerializer(clazz);
+                    put(clazz, writer);
+                }
+            }
+
+            if (writer == null) {
+                writer = serializers.get(clazz);
+            }
+        }
+        return writer;
+    }
+	
+	public final ObjectSerializer get(Type key) {
+	    return this.serializers.get(key);
+	}
+
+    public boolean put(Object type, Object value) {
+        return put((Type)type, (ObjectSerializer)value);
+    }
+
+	public boolean put(Type type, ObjectSerializer value) {
+        return this.serializers.put(type, value);
+	}
+
+    /**
+     * 1.2.24
+     * @param enumClasses
+     */
+	public void configEnumAsJavaBean(Class<? extends Enum>... enumClasses) {
+        for (Class<? extends Enum> enumClass : enumClasses) {
+            put(enumClass, createJavaBeanSerializer(enumClass));
+        }
+    }
+
+    /**
+     * for spring config support
+     * @param propertyNamingStrategy
+     */
+    public void setPropertyNamingStrategy(PropertyNamingStrategy propertyNamingStrategy) {
+        this.propertyNamingStrategy = propertyNamingStrategy;
+    }
+
+    public void clearSerializers() {
+        this.serializers.clear();
+        this.initSerializers();
+    }
+
+    public void register(Module module) {
+        this.modules.add(module);
+    }
 }

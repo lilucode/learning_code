@@ -1,23 +1,27 @@
 package com.alibaba.fastjson.util;
 
 import java.io.BufferedReader;
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
 public class ServiceLoader {
 
-    private static final String PREFIX = "META-INF/services/";
-    
+    private static final String      PREFIX     = "META-INF/services/";
+
     private static final Set<String> loadedUrls = new HashSet<String>();
 
     @SuppressWarnings("unchecked")
     public static <T> Set<T> load(Class<T> clazz, ClassLoader classLoader) {
+        if (classLoader == null) {
+            return Collections.emptySet();
+        }
+        
         Set<T> services = new HashSet<T>();
 
         String className = clazz.getName();
@@ -35,7 +39,7 @@ public class ServiceLoader {
                 load(url, serviceNames);
                 loadedUrls.add(url.toString());
             }
-        } catch (IOException ex) {
+        } catch (Throwable ex) {
             // skip
         }
 
@@ -75,15 +79,8 @@ public class ServiceLoader {
                 set.add(line);
             }
         } finally {
-            close(reader);
-            close(is);
+            IOUtils.close(reader);
+            IOUtils.close(is);
         }
     }
-
-    public static void close(Closeable x) throws IOException {
-        if (x != null) {
-            x.close();
-        }
-    }
-
 }

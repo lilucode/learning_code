@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2101 Alibaba Group.
+ * Copyright 1999-2017 Alibaba Group.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 package com.alibaba.fastjson.parser;
 
 /**
- * @author wenshao<szujobs@hotmail.com>
+ * @author wenshao[szujobs@hotmail.com]
  */
 public class JSONToken {
 
@@ -63,6 +63,12 @@ public class JSONToken {
 
     public final static int SET                  = 21;
     public final static int TREE_SET             = 22;
+    
+    public final static int UNDEFINED            = 23; // undefined
+
+    public final static int SEMI                 = 24;
+    public final static int DOT                  = 25;
+    public final static int HEX                  = 26;
 
     public static String name(int value) {
         switch (value) {
@@ -100,6 +106,10 @@ public class JSONToken {
                 return ",";
             case COLON:
                 return ":";
+            case SEMI:
+                return ";";
+            case DOT:
+                return ".";
             case IDENTIFIER:
                 return "ident";
             case FIELD_NAME:
@@ -110,8 +120,12 @@ public class JSONToken {
                 return "Set";
             case TREE_SET:
                 return "TreeSet";
+            case UNDEFINED:
+                return "undefined";
+            case HEX:
+                return "hex";
             default:
-                return "Unkown";
+                return "Unknown";
         }
     }
 }

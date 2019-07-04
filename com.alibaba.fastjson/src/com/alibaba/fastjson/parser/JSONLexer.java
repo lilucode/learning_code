@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2101 Alibaba Group.
+ * Copyright 1999-2019 Alibaba Group.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,57 +16,35 @@
 package com.alibaba.fastjson.parser;
 
 import java.math.BigDecimal;
-import java.util.Calendar;
+import java.util.Collection;
+import java.util.Locale;
+import java.util.TimeZone;
 
-/**
- * @author wenshao<szujobs@hotmail.com>
- */
 public interface JSONLexer {
-    boolean isResetFlag();
-    
-    void setResetFlag(boolean resetFlag);
+
+    char EOI            = 0x1A;
+    int  NOT_MATCH      = -1;
+    int  NOT_MATCH_NAME = -2;
+    int  UNKNOWN        = 0;
+    int  OBJECT         = 1;
+    int  ARRAY          = 2;
+    int  VALUE          = 3;
+    int  END            = 4;
+    int  VALUE_NULL     = 5;
+
+    int token();
+
+    String tokenName();
+
+    void skipWhitespace();
 
     void nextToken();
 
     void nextToken(int expect);
 
-    int token();
-    
-    String tokenName();
-
-    int pos();
-
-    String stringVal();
-
-    Number integerValue();
-    
-    void nextTokenWithColon(int expect);
-
-    BigDecimal decimalValue();
-    
-    Number decimalValue(boolean decimal);
-    
-    double doubleValue();
-    
-    float floatValue();
-
-    void config(Feature feature, boolean state);
-
-    boolean isEnabled(Feature feature);
-
-    String numberString();
-
-    boolean isEOF();
-
-    String symbol(SymbolTable symbolTable);
-
-    boolean isBlankInput();
-
     char getCurrent();
 
-    void skipWhitespace();
-
-    void incrementBufferPosition();
+    char next();
 
     String scanSymbol(final SymbolTable symbolTable);
 
@@ -74,19 +52,72 @@ public interface JSONLexer {
 
     void resetStringPosition();
 
+    void scanNumber();
+
+    int pos();
+
+    Number integerValue();
+
+    BigDecimal decimalValue();
+
+    Number decimalValue(boolean decimal);
+
     String scanSymbolUnQuoted(final SymbolTable symbolTable);
+
+    String stringVal();
+
+    boolean isEnabled(int feature);
+
+    boolean isEnabled(Feature feature);
+
+    void config(Feature feature, boolean state);
 
     void scanString();
 
-    void scanNumber();
+    int intValue();
 
-    boolean scanISO8601DateIfMatch();
+    void nextTokenWithColon();
 
-    Calendar getCalendar();
+    void nextTokenWithColon(int expect);
 
-    int intValue() throws NumberFormatException;
+    boolean isBlankInput();
 
-    long longValue() throws NumberFormatException;
-    
+    void close();
+
+    long longValue();
+
+    boolean isRef();
+
+    String numberString();
+
     byte[] bytesValue();
+
+    float floatValue();
+
+    int scanInt(char expectNext);
+    long scanLong(char expectNextChar);
+    float scanFloat(char seperator);
+    double scanDouble(char seperator);
+    boolean scanBoolean(char expectNext);
+    BigDecimal scanDecimal(char seperator);
+
+    String scanString(char expectNextChar);
+
+    Enum<?> scanEnum(Class<?> enumClass, final SymbolTable symbolTable, char serperator);
+
+    String scanSymbolWithSeperator(final SymbolTable symbolTable, char serperator);
+
+    void scanStringArray(Collection<String> collection, char seperator);
+
+    TimeZone getTimeZone();
+
+    void setTimeZone(TimeZone timeZone);
+
+    Locale getLocale();
+
+    void setLocale(Locale locale);
+
+    String info();
+
+    int getFeatures();
 }
