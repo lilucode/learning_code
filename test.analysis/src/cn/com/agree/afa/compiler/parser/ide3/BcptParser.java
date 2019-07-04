@@ -40,6 +40,7 @@ public class BcptParser extends AbstractParser<BCModel> {
 	private List<String> exception_id = new ArrayList<String>();
 	private String default_id;
 	private String default_next_id;
+	private String default_error_id;
 	private Map<String, String> change_id = new ConcurrentHashMap<String, String>();
 
 	public String componentName;
@@ -115,7 +116,6 @@ public class BcptParser extends AbstractParser<BCModel> {
 	public void changeEndId(Collection<Element> nodeList) throws XmlParseException {
 		for (Element node : nodeList) {
 			int type = Integer.parseInt(getChildElementText(node, "Type"));
-			String desp = getChildElementText(node, "Desp");
 			if (type == 3) {
 				String end = getChildElementText(node, "Id");
 				end_id.add(end);
@@ -126,6 +126,7 @@ public class BcptParser extends AbstractParser<BCModel> {
 				// 默认逻辑错误委托
 				default_id = getChildElementText(node, "Id");
 				default_next_id = getNextId(node, "成功");
+				default_error_id = getNextId(node, "失败");
 			} else if (type == 10) {
 				// 中转节点
 				change_id.put("id", getChildElementText(node, "Id"));
@@ -173,7 +174,7 @@ public class BcptParser extends AbstractParser<BCModel> {
 		if (atIndex >= 0) {
 			desc = desc.substring(atIndex + 1);
 		}
-		if (desc.equals("取全局错误到容器")) {
+		if (idString.equals(default_error_id)) {
 			return nodeModel;
 		}
 
@@ -207,10 +208,19 @@ public class BcptParser extends AbstractParser<BCModel> {
 		} else if (type == 7 || type == 12) {
 			LfcComponentElement lce = new LfcComponentElement();
 			if (type == 7) {
+				String filePath = getChildElementText(node, "FilePath");
+				try {
+					
+					filePath = filePath.substring(filePath.indexOf("bank"), filePath.lastIndexOf("/")).replaceAll("bank", "")
+							+ "/";
+				} catch (Exception e) {
+					// TODO: handle exception
+					System.out.println("内嵌lfc路径有问题："+componentName);
+				}
 				// Component/Implementation/Node/FilePath 内嵌lfc的路径
-				lce.setLfcPath("/demo-s/business/" + target.substring(target.lastIndexOf(".") + 1) + ".lfc");
-			}else {
-				lce.setLfcPath("/demo-s/business/" + desc + ".lfc");
+				lce.setLfcPath("/demo-s/business" + filePath + target.substring(target.lastIndexOf(".") + 1) + ".lfc");
+			} else {
+				lce.setLfcPath("/demo-s/business" + desc + ".lfc");
 			}
 
 			List<Arg> cInArgs = getArgs(node, "In");
@@ -377,12 +387,13 @@ public class BcptParser extends AbstractParser<BCModel> {
 			ae.setName(componentArg.getKey());
 			ae.setDescription(componentArg.getName());
 			ae.setValue(componentArg.getArg().replaceAll("\"", "\\\\\"").replaceAll("\n", ""));
-//			String arg_Value = componentArg.getArg();
-//			if (arg_Value.indexOf("\"") != -1) {
-//				ae.setValue(arg_Value.substring(arg_Value.indexOf("\"") + 1, arg_Value.lastIndexOf("\"")));
-//			} else {
-//				ae.setValue(arg_Value);
-//			}
+			// String arg_Value = componentArg.getArg();
+			// if (arg_Value.indexOf("\"") != -1) {
+			// ae.setValue(arg_Value.substring(arg_Value.indexOf("\"") + 1,
+			// arg_Value.lastIndexOf("\"")));
+			// } else {
+			// ae.setValue(arg_Value);
+			// }
 			cInList.add(ae);
 		}
 		return cInList;
