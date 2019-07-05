@@ -23,6 +23,7 @@ import cn.com.agree.afa.compiler.model.Arg;
 import cn.com.agree.afa.compiler.model.BCModel;
 import cn.com.agree.afa.compiler.model.ComponentArg;
 import cn.com.agree.afa.compiler.model.NodeModel;
+import cn.com.agree.afa.compiler.model.TerminalsMode;
 import cn.com.agree.afa.compiler.parser.XmlParseException;
 
 public class BcptParser extends AbstractParser<BCModel> {
@@ -82,17 +83,17 @@ public class BcptParser extends AbstractParser<BCModel> {
 		return bcModel;
 	}
 
-	protected Set<NodeModel> getNodeModels(Element impl) throws XmlParseException {
+	protected List<NodeModel> getNodeModels(Element impl) throws XmlParseException {
 		List<Element> nodeList = getDirectChildElements(impl, "Node");
 		return getNodeModels(nodeList);
 	}
 
 	// ide右侧逻辑组件实现node
-	protected Set<NodeModel> getNodeModels(Collection<Element> nodeList) throws XmlParseException {
+	protected List<NodeModel> getNodeModels(Collection<Element> nodeList) throws XmlParseException {
 		if (nodeList.size() < 1) {
 			throw new XmlParseException("缺少Node节点");
 		}
-		Set<NodeModel> nodeModels = new TreeSet<>();
+		List<NodeModel> nodeModels = new ArrayList<NodeModel>();
 		changeEndId(nodeList);
 		for (Element node : nodeList) {
 			NodeModel nodeModel = null;
@@ -109,7 +110,6 @@ public class BcptParser extends AbstractParser<BCModel> {
 				throw new XmlParseException(newMessage, e);
 			}
 		}
-
 		return nodeModels;
 	}
 
@@ -209,6 +209,7 @@ public class BcptParser extends AbstractParser<BCModel> {
 			LfcComponentElement lce = new LfcComponentElement();
 			if (type == 7) {
 				String filePath = getChildElementText(node, "FilePath");
+				nodeModel.setFilePath(filePath);
 				try {
 					
 					filePath = filePath.substring(filePath.indexOf("bank"), filePath.lastIndexOf("/")).replaceAll("bank", "")
@@ -250,10 +251,13 @@ public class BcptParser extends AbstractParser<BCModel> {
 			setGeometry(lfc.getGeometry());
 		} else if (type == 3) {
 			// Component/Implementation/Node/Id
-			String endId = getChildElementText(node, "Id");
-			nodeModel.setEndId(endId);
-			lfc.setEnd("1001");
-			setGeometry(lfc.getEndstep().getGeometry());
+			if(lfc.getEnd().size()==0) {
+				
+				String endId = getChildElementText(node, "Id");
+				nodeModel.setEndId(endId);
+				lfc.setEnd("1001");
+				setGeometry(lfc.getEndstep().getGeometry());
+			}
 		}
 
 		return nodeModel;
@@ -277,13 +281,14 @@ public class BcptParser extends AbstractParser<BCModel> {
 			List<Element> terminals = getDirectChildElements(parallelTerminals, "Terminal");
 
 			for (Element terminalVariable : terminals) {
+				TerminalsMode terminalsMode=new TerminalsMode();
 				// Component/Implementation/Node/Terminals/Terminal/Name
 				String terminalName = getChildElementText(terminalVariable, "Name");
-				nodeModel.setTerminalName(terminalName);
+				terminalsMode.setTerminalName(terminalName);
 				String sourceTerminal = terminalName;
 				// Component/Implementation/Node/Terminals/Terminal/Desp
 				String terminalDesc = getChildElementText(terminalVariable, "Desp");
-				nodeModel.setTerminalDesc(terminalDesc);
+				terminalsMode.setTerminalDesc(terminalDesc);
 				Element sourceConnections = getDirectChildElement(
 						(Element) terminalVariable.getParentNode().getParentNode(), "SourceConnections");
 				if (sourceConnections == null) {
@@ -296,7 +301,7 @@ public class BcptParser extends AbstractParser<BCModel> {
 
 						// Component/Implementation/Node/SourceConnections/Connection/targetId
 						String targetNodeId = getChildElementText(connection, "targetId");
-						nodeModel.setTargetNodeId(targetNodeId);
+						terminalsMode.setTargetNodeId(targetNodeId);
 						if (!terminalDesc.equals("失败")) {
 
 							ComponentOut out = new ComponentOut();
@@ -322,6 +327,7 @@ public class BcptParser extends AbstractParser<BCModel> {
 						break;
 					}
 				}
+				nodeModel.addTerminals(terminalsMode);
 			}
 		}
 	}

@@ -75,11 +75,11 @@ abstract class AbstractParser<T> implements IParser<T> {
 	}
 
 	// ide右侧逻辑组件实现node
-	protected Set<NodeModel> getNodeModels(Collection<Element> nodeList) throws XmlParseException {
+	protected List<NodeModel> getNodeModels(Collection<Element> nodeList) throws XmlParseException {
 		if (nodeList.size() < 1) {
 			throw new XmlParseException("缺少Node节点");
 		}
-		Set<NodeModel> nodeModels = new TreeSet<>();
+		List<NodeModel> nodeModels = new ArrayList<NodeModel>();
 		for (Element node : nodeList) {
 			NodeModel nodeModel = null;
 			try {
@@ -100,7 +100,7 @@ abstract class AbstractParser<T> implements IParser<T> {
 	}
 
 	// ide右侧逻辑组件实现node
-	protected Set<NodeModel> getNodeModels(Element impl) throws XmlParseException {
+	protected List<NodeModel> getNodeModels(Element impl) throws XmlParseException {
 		Element nodes = getDirectChildElement(impl, "Nodes");
 		List<Element> nodeList = getDirectChildElements(nodes, "Node");
 		return getNodeModels(nodeList);
