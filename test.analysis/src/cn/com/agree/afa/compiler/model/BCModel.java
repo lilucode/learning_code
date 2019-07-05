@@ -4,18 +4,18 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import cn.com.agree.ab.a5.runtime.lfc.LogicFlowControl;
 
 public class BCModel {
+
+	private String auth; // Component/Auth
 	private String name; // Component/RefImpl
 	private String desc; // Component/Desp
-	private String auth; // Component/Auth
+	private List<ComponentArg> inputArgs; // Component/InArgs
+	private List<ComponentArg> outputArgs; // Component/OutArgs
+	private List<NodeModel> nodeModels; // Node
 	private String debugMode;
 	private boolean isDebugComplie;
 	private String aspectUsed;
-	private Set<NodeModel> nodeModels; // Node
-	private List<ComponentArg> inputArgs; // Component/InArgs
-	private List<ComponentArg> outputArgs; // Component/OutArgs
 	private InfoLogContext logContext = new InfoLogContext();
 
 
@@ -59,11 +59,11 @@ public class BCModel {
 		this.desc = desc;
 	}
 
-	public void setNodeModels(Set<NodeModel> nodeModels) {
-		this.nodeModels = new TreeSet<>(nodeModels);
+	public void setNodeModels(List<NodeModel> nodeModels) {
+		this.nodeModels = nodeModels;
 	}
 
-	public Set<NodeModel> getNodeModels() {
+	public List<NodeModel> getNodeModels() {
 		return this.nodeModels;
 	}
 

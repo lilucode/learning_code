@@ -5,13 +5,14 @@ package cn.com.agree.afa.compiler.model;
  *
  */
 public class Arg {
-	private int id;
-	private String key = "";
-	private int logLevel = 4;
+	
+	private String key = "";	// Component/Implementation/Node/InArgs/Arg/Key
+	private String name = "";	// Component/Implementation/Node/InArgs/Arg/Name
+	private String type = "";	// Component/Implementation/Node/InArgs/Arg/Type
+	private String arg = "";	// Component/Implementation/Node/InArgs/Arg/Arg
 	private String value = "";
-	private String type = "";
-	private String name = "";
-	private String arg = "";
+	private int id;
+	private int logLevel = 4;
 
 	public Arg copy() {
 		Arg arg = new Arg();

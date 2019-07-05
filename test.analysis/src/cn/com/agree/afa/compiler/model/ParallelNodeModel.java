@@ -16,9 +16,9 @@ public class ParallelNodeModel extends NodeModel {
 		this.outStatus = outStatus;
 	}
 
-	public Map<String, ParallelTerminal> getTerminals() {
-		return this.parallelTerminals;
-	}
+//	public Map<String, ParallelTerminal> getTerminals() {
+//		return this.parallelTerminals;
+//	}
 
 	public void setTerminals(Map<String, ParallelTerminal> terminals) {
 		this.parallelTerminals = terminals;

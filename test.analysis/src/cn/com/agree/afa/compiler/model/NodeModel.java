@@ -1,15 +1,26 @@
 package cn.com.agree.afa.compiler.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 public class NodeModel implements Comparable<NodeModel> {
 	private int id;
-	private String idString;		//Component/Implementation/Node/Id
-	private String desc;			//Component/Implementation/Node/Desp
-	private int type;				//Component/Implementation/Node/Type
-	private String cptName;			//Component/Implementation/Node/Target
+	private int type; 			// Component/Implementation/Node/Type
+	private String idString; 	// Component/Implementation/Node/Id
+	private String name; 		// Component/Implementation/Node/Name
+	private String desc; 		// Component/Implementation/Node/Desp
+	private String cptName; 	// Component/Implementation/Node/Target
+	private String location; 	// Component/Implementation/Node/Constraint/Location
+	private String size; 		// Component/Implementation/Node/Constraint/Size
+	private List<Arg> inputArgs; 	// Component/Implementation/Node/InArgs/Arg
+	private List<Arg> outputArgs; 	// Component/Implementation/Node/OutArgs/Arg
+	private String filePath; 		// Component/Implementation/Node/FilePath
+	private List<TerminalsMode> terminals = new ArrayList<TerminalsMode>(); 	// 出口
+																				// Component/Implementation/Node/Terminals
+	private String targetId; 	// Component/Implementation/Node/SourceConnections/Connection/targetId 开始id
+	private String endId; 		// Component/Implementation/Node/Id 正常结束id
 	private boolean async;
 	private int value;
 	private int checkTradeExist = ExitType.DEFAULT_ERROR;
@@ -17,16 +28,10 @@ public class NodeModel implements Comparable<NodeModel> {
 	private int defaultStatus;
 	private boolean debugMode;
 	private DebugInfo debugInfo;
-	private List<Arg> inputArgs;
-	private List<Arg> outputArgs;
-	private String aspectUsed;		
-	private String targetNodeId;	//Component/Implementation/Node/SourceConnections/Connection/targetId
-	private String terminalDesc;	//Component/Implementation/Node/Terminals/Terminal/Desp
-	private String terminalName;	//Component/Implementation/Node/Terminals/Terminal/Name
-	private String endId;			//Component/Implementation/Node/Id
-	private String targetId;		// Component/Implementation/Node/SourceConnections/Connection/targetId
-	private String location;		//Component/Implementation/Node/Constraint/Location
-	private String size;			//Component/Implementation/Node/Constraint/Size
+	private String aspectUsed;
+	private String terminalName;
+	private String terminalDesc;
+	private String targetNodeId;
 	private Map<String, Integer> nodeRelations = new TreeMap<>();
 	public static final String DEFAULT_BEGIN_DESC = "开始";
 	public static final String DEFAULT_BEGIN_CPTNAME = "Begin";
@@ -35,19 +40,36 @@ public class NodeModel implements Comparable<NodeModel> {
 	public static final String DEFAULT_END_CPTNAME = "End";
 	private InfoLogContext logContext = new InfoLogContext();
 
-	public int compareTo(NodeModel o) {
-		if (this.id > o.id) {
-			return 1;
-		}
-		return this.id == o.id ? 0 : -1;
+	public String getName() {
+		return name;
 	}
-	
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getFilePath() throws Exception{
+		return filePath;
+	}
+
+	public void setFilePath(String filePath) {
+		this.filePath = filePath;
+	}
+
 	public String getTargetNodeId() {
 		return targetNodeId;
 	}
 
 	public void setTargetNodeId(String targetNodeId) {
 		this.targetNodeId = targetNodeId;
+	}
+
+	public String getTerminalName() {
+		return terminalName;
+	}
+
+	public void setTerminalName(String terminalName) {
+		this.terminalName = terminalName;
 	}
 
 	public String getTerminalDesc() {
@@ -58,12 +80,23 @@ public class NodeModel implements Comparable<NodeModel> {
 		this.terminalDesc = terminalDesc;
 	}
 
-	public String getTerminalName() {
-		return terminalName;
+	public void setTerminals(List<TerminalsMode> terminals) {
+		this.terminals = terminals;
 	}
 
-	public void setTerminalName(String terminalName) {
-		this.terminalName = terminalName;
+	public List<TerminalsMode> getTerminals() {
+		return terminals;
+	}
+
+	public void addTerminals(TerminalsMode terminal) {
+		this.terminals.add(terminal);
+	}
+
+	public int compareTo(NodeModel o) {
+		if (this.id > o.id) {
+			return 1;
+		}
+		return this.id == o.id ? 0 : -1;
 	}
 
 	public String getEndId() {
