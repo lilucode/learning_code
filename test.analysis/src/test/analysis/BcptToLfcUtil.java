@@ -41,6 +41,7 @@ public class BcptToLfcUtil {
 	private String default_id;
 	private String default_next_id;
 	private String default_error_id;
+	private String bcptName;
 
 	/**
 	 * bcpt入参
@@ -50,6 +51,10 @@ public class BcptToLfcUtil {
 	 * bcpt出参
 	 */
 	private List<String> outArgs = new ArrayList<String>();
+
+	public BcptToLfcUtil(String bcptName) {
+		this.bcptName = bcptName;
+	}
 
 	// 从传入的BCModel获取参数传入lfc
 	public LogicFlowControl parse(BCModel bcModel) {
@@ -89,15 +94,17 @@ public class BcptToLfcUtil {
 				if (type == 7) {
 					try {
 						String filePath = nodeModel.getFilePath();
-						filePath = filePath.substring(filePath.indexOf("bank"), filePath.lastIndexOf("/"))
-								.replaceAll("bank", "") + "/";
-						lce.setLfcPath("/demo-s/business" + filePath + target + ".lfc");
+						filePath = filePath.substring(0, filePath.lastIndexOf("/"))
+								.replaceAll("/functionModule/businessComponent", "") + "/";
+						// lce.setLfcPath("/demo-s/business" + filePath + target + ".lfc");
+						lce.setLfcPath("/" + BcptToLfcMain.projectName + "/business" + filePath + target + ".lfc");
 					} catch (Exception e) {
-						System.out.println("内嵌lfc路径有问题：" + bcModel.getName() + "包含的业务组件源文件已被删除");
+
+						System.out.println(bcptName + ":" + bcModel.getName() + "包含的业务组件源文件已被删除");
 						lce.setLfcPath("业务组件源文件已被删除");
 					}
 				} else {
-					lce.setLfcPath("/demo-s/business" + target + ".lfc");
+					lce.setLfcPath("/" + BcptToLfcMain.projectName + "/business" + target + ".lfc");
 				}
 				lfc.addLfc(setLfcAndComponent(lce, nodeModel));
 			} else if (type == 2) {

@@ -2,8 +2,10 @@ package test.analysis;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
 import com.alibaba.fastjson.JSON;
 
@@ -13,61 +15,70 @@ import cn.com.agree.afa.compiler.parser.ide3.BcptBeanParse;
 
 public class BcptToLfcMain {
 
-	public static void main(String[] args) throws Exception {
+	public static String projectName;
 
-		ArrayList<String> listFileName = new ArrayList<String>();
-		getAllFileName("./bcpt/", listFileName);
+	public static void main(String[] args) throws Exception {
+		if (args.length != 2) {
+			System.err.println("传入参数不合法，需要传入两个参数，含义分别为：项目名、要转换的文件夹路径");
+			return;
+		}
+		projectName = args[0];
+
+		ArrayList<File> listFiles = new ArrayList<File>();
+		File baseFile = new File(args[1]);
+		if(!baseFile.exists()) {
+			System.err.println(baseFile.getAbsolutePath() + "不存在");
+			return;
+		}
+		getAllFile(baseFile, listFiles);
+
+		File lfcFile = new File(baseFile, "lfc");
+		if (!lfcFile.exists()) {
+			lfcFile.mkdir();
+		}
 
 		int j = 0;
-		for (String name : listFileName) {
-			File file = new File(name);
-			if (name.contains(".bcpt")) {
-
-//				System.out.println(name);
+		for (File file : listFiles) {
+			String name = file.getName();
+			if (name.endsWith(".bcpt")) {
 				BcptBeanParse bbp = new BcptBeanParse();
 				BCModel bm = bbp.parse(file);
-//				System.out.println(JSON.toJSONString(bm));
-				BcptToLfcUtil blu=new BcptToLfcUtil();
-				LogicFlowControl lfc=blu.parse(bm);
+				BcptToLfcUtil blu = new BcptToLfcUtil(file.getAbsolutePath());
+				LogicFlowControl lfc = blu.parse(bm);
 				String content = JSON.toJSONString(lfc);
-//				System.out.println(content);
 				content = FormatUtil.formatJson(content);
 
-				name = name.substring(0, name.lastIndexOf("\\")).replaceAll("bcpt", "lfc") + "\\"+bm.getName() + ".lfc";
-				File file3 = new File(name);
+				Path relative = baseFile.toPath().relativize(file.getParentFile().toPath());
+				File file3 = new File(lfcFile, relative + "/" + bm.getName() + ".lfc");
 				if (!file3.exists()) {
 					File uploadDir = file3.getParentFile();
-					if (!uploadDir.isDirectory()) {
+					if (!uploadDir.exists()) {
 						uploadDir.mkdirs();
-						file3.createNewFile();
 					}
+					file3.createNewFile();
 				}
-				FileOutputStream fop = new FileOutputStream(file3);
-				fop.write(content.getBytes());
-				j++;
-				fop.flush();
-				fop.close();
+				try (FileOutputStream fop = new FileOutputStream(file3);) {
+					fop.write(content.getBytes());
+					fop.flush();
+					j++;
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
-		System.out.println("总共生成lfc文件：" + j);
+		System.out.println("总共生成lfc文件：" + j + "，生成的文件目录为：" + lfcFile.getAbsolutePath());
 
 	}
 
-	public static void getAllFileName(String path, ArrayList<String> listFileName) {
-		File file = new File(path);
-		File[] files = file.listFiles();
-		String[] names = file.list();
-		if (names != null) {
-			String[] completNames = new String[names.length];
-			for (int i = 0; i < names.length; i++) {
-				completNames[i] = path + names[i];
-			}
-			listFileName.addAll(Arrays.asList(completNames));
-		}
-		for (File a : files) {
-			if (a.isDirectory()) {// 如果文件夹下有子文件夹，获取子文件夹下的所有文件全路径。
-				getAllFileName(a.getAbsolutePath() + "\\", listFileName);
+	public static void getAllFile(File baseFile, List<File> listFile) {
+		File[] files = baseFile.listFiles();
+		for (File sub : files) {
+			if (sub.isDirectory()) {
+				getAllFile(sub, listFile);
+			} else {
+				listFile.add(sub);
 			}
 		}
 	}
+
 }
