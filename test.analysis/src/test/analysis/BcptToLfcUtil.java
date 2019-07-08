@@ -262,9 +262,9 @@ public class BcptToLfcUtil {
 			ae.setCaption(componentArg.getName());
 			ae.setEditor(componentArg.getType());
 			ae.setValue(componentArg.getArg().replaceAll("\n", ""));
-			if(ae.getValue().contains("_REQ_")) {
-				System.out.println(ae.getValue());
-			}
+//			if(ae.getValue().contains("_REQ_")) {
+//				System.out.println(ae.getValue());
+//			}
 			list.add(ae);
 		}
 		return list;

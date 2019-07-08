@@ -9,7 +9,7 @@ public class Endstep {
 
 	private String id="1000";
 	
-	private Geometry geometry = new Geometry();
+	private Geometry geometry = new Geometry(100, 100, 100, 100);
 
 	private List<Map<String,String>> in=new ArrayList<Map<String,String>>();
 	
