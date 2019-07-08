@@ -76,7 +76,8 @@ public class BcptToLfcUtil {
 								.replaceAll("bank", "") + "/";
 						lce.setLfcPath("/demo-s/business" + filePath + target + ".lfc");
 					} catch (Exception e) {
-						 System.out.println("内嵌lfc路径有问题："+bcModel.getName());
+						 System.out.println("内嵌lfc路径有问题："+bcModel.getName()+"包含的业务组件源文件已被删除");
+						 lce.setLfcPath("业务组件源文件已被删除");
 					}
 				} else {
 					lce.setLfcPath("/demo-s/business" + target + ".lfc");
@@ -168,7 +169,9 @@ public class BcptToLfcUtil {
 
 		ce.setId(nodeModel.getIdString());
 		ce.setShowId(nodeModel.getIdString());
-		ce.setCaption(nodeModel.getName());
+		//技术组件显示文字
+		ce.setCaption(nodeModel.getDesc());
+		//设置技术组件name
 		String target = nodeModel.getCptName();
 		String target_name = target.substring(target.lastIndexOf(".") + 1) + "Logiclet";
 		ce.setName(target_name.substring(0, 1).toUpperCase() + target_name.substring(1));
