@@ -18,13 +18,11 @@ public class BcptToLfcMain {
 		ArrayList<String> listFileName = new ArrayList<String>();
 		getAllFileName("./bcpt/", listFileName);
 
-		int i = 0;
 		int j = 0;
 		for (String name : listFileName) {
 			File file = new File(name);
 			if (name.contains(".bcpt")) {
 
-				i++;
 //				System.out.println(name);
 				BcptBeanParse bbp = new BcptBeanParse();
 				BCModel bm = bbp.parse(file);
@@ -51,8 +49,7 @@ public class BcptToLfcMain {
 				fop.close();
 			}
 		}
-		System.out.println("总共有bcpt文件：" + i);
-		System.out.println("成功生成lfc文件：" + j);
+		System.out.println("总共生成lfc文件：" + j);
 
 	}
 

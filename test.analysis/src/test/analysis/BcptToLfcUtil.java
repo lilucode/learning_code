@@ -18,6 +18,8 @@ import cn.com.agree.afa.compiler.model.BCModel;
 import cn.com.agree.afa.compiler.model.ComponentArg;
 import cn.com.agree.afa.compiler.model.NodeModel;
 import cn.com.agree.afa.compiler.model.TerminalsMode;
+import req.transfer.ParseException;
+import req.transfer.REQParser;
 
 public class BcptToLfcUtil {
 
@@ -40,7 +42,15 @@ public class BcptToLfcUtil {
 	private String default_next_id;
 	private String default_error_id;
 
-	
+	/**
+	 * bcpt入参
+	 */
+	private List<String> inArgs = new ArrayList<String>();
+	/**
+	 * bcpt出参
+	 */
+	private List<String> outArgs = new ArrayList<String>();
+
 	// 从传入的BCModel获取参数传入lfc
 	public LogicFlowControl parse(BCModel bcModel) {
 		LogicFlowControl lfc = new LogicFlowControl();
@@ -51,24 +61,31 @@ public class BcptToLfcUtil {
 		lfc.addInArgs(getArgElement(bcModel.getInputArgs()));
 		lfc.addOutArgs(getArgElement(bcModel.getOutputArgs()));
 
+		for (ComponentArg arg : bcModel.getInputArgs()) {
+			inArgs.add(arg.getKey());
+		}
+		for (ComponentArg arg : bcModel.getOutputArgs()) {
+			outArgs.add(arg.getKey());
+		}
+
 		getSpecialNodeId(bcModel);
-		
+
 		for (NodeModel nodeModel : bcModel.getNodeModels()) {
-			
+
 			if (nodeModel.getIdString().equals(default_error_id)) {
 				continue;
 			}
 			int type = nodeModel.getType();
 			if (type == 11) {
-				
+
 				LogicletComponentElement ce = new LogicletComponentElement();
 				lfc.addComponent(setLfcAndComponent(ce, nodeModel));
 			} else if (type == 7 || type == 12) {
-				
+
 				LfcComponentElement lce = new LfcComponentElement();
 				lce.setMappingPath("/" + bcModel.getName() + ".lfc");
-				String target=nodeModel.getCptName().substring(nodeModel.getCptName().lastIndexOf(".") + 1);
-				//内嵌的地址
+				String target = nodeModel.getCptName().substring(nodeModel.getCptName().lastIndexOf(".") + 1);
+				// 内嵌的地址
 				if (type == 7) {
 					try {
 						String filePath = nodeModel.getFilePath();
@@ -76,8 +93,8 @@ public class BcptToLfcUtil {
 								.replaceAll("bank", "") + "/";
 						lce.setLfcPath("/demo-s/business" + filePath + target + ".lfc");
 					} catch (Exception e) {
-						 System.out.println("内嵌lfc路径有问题："+bcModel.getName()+"包含的业务组件源文件已被删除");
-						 lce.setLfcPath("业务组件源文件已被删除");
+						System.out.println("内嵌lfc路径有问题：" + bcModel.getName() + "包含的业务组件源文件已被删除");
+						lce.setLfcPath("业务组件源文件已被删除");
 					}
 				} else {
 					lce.setLfcPath("/demo-s/business" + target + ".lfc");
@@ -94,20 +111,20 @@ public class BcptToLfcUtil {
 					} else if (!change_id.isEmpty() && change_id.keySet().contains(targetId)) {
 						targetId = change_id.get(targetId);
 					}
-					//得到开始id
+					// 得到开始id
 					lfc.setStart(Integer.valueOf(targetId));
 				}
 				setGeometry(lfc.getGeometry(), nodeModel);
 			} else if (type == 3) {
-				
-				//结束组件
+
+				// 结束组件
 				if (lfc.getEnd().size() == 0) {
 					lfc.setEnd("1001");
 					setGeometry(lfc.getEndstep().getGeometry(), nodeModel);
 				}
 			}
 		}
-		
+
 		return lfc;
 
 	}
@@ -169,9 +186,9 @@ public class BcptToLfcUtil {
 
 		ce.setId(nodeModel.getIdString());
 		ce.setShowId(nodeModel.getIdString());
-		//技术组件显示文字
+		// 技术组件显示文字
 		ce.setCaption(nodeModel.getDesc());
-		//设置技术组件name
+		// 设置技术组件name
 		String target = nodeModel.getCptName();
 		String target_name = target.substring(target.lastIndexOf(".") + 1) + "Logiclet";
 		ce.setName(target_name.substring(0, 1).toUpperCase() + target_name.substring(1));
@@ -265,9 +282,15 @@ public class BcptToLfcUtil {
 			ae.setCaption(componentArg.getName());
 			ae.setEditor(componentArg.getType());
 			ae.setValue(componentArg.getArg().replaceAll("\n", ""));
-//			if(ae.getValue().contains("_REQ_")) {
-//				System.out.println(ae.getValue());
-//			}
+			REQParser parser = new REQParser(ae.getValue());
+			parser.addAllInArg(inArgs);
+			parser.addAllOutArg(outArgs);
+			try {
+				String result = (String) parser.parse();
+				ae.setValue(result);
+			} catch (ParseException e) {
+				System.err.println("报错：" + ae.getValue());
+			}
 			list.add(ae);
 		}
 		return list;
