@@ -3,6 +3,7 @@ package test.analysis;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,8 @@ public class BcptToLfcMain {
 	public static String projectName;
 
 	public static void main(String[] args) throws Exception {
+//		args=new String[] {"demo-s","./bcpt/"};
+		
 		if (args.length != 2) {
 			System.err.println("传入参数不合法，需要传入两个参数，含义分别为：项目名、要转换的文件夹路径");
 			return;
@@ -57,9 +60,10 @@ public class BcptToLfcMain {
 					}
 					file3.createNewFile();
 				}
-				try (FileOutputStream fop = new FileOutputStream(file3);) {
-					fop.write(content.getBytes());
-					fop.flush();
+				try (FileOutputStream fos = new FileOutputStream(file3);
+						OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8")) {
+					osw.write(content);
+					osw.flush();
 					j++;
 				} catch (IOException e) {
 					e.printStackTrace();
