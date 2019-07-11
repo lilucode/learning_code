@@ -74,7 +74,6 @@ public class BcptToLfcUtil {
 
 	// 从传入的BCModel获取参数传入lfc
 	public LogicFlowControl parse(BCModel bcModel) {
-		NodeMap = getAllNodeId(bcModel);
 		LogicFlowControl lfc = new LogicFlowControl();
 		lfc.getFileDescription().setAuthor(bcModel.getAuth());
 		lfc.getFileDescription().setFunction(bcModel.getName());
@@ -95,6 +94,7 @@ public class BcptToLfcUtil {
 	}
 
 	public LogicFlowControl parserNode(BCModel bcModel,LogicFlowControl lfc) {
+		NodeMap = getAllNodeId(bcModel);
 		getSpecialNodeId(bcModel);
 		for (NodeModel nodeModel : bcModel.getNodeModels()) {
 
