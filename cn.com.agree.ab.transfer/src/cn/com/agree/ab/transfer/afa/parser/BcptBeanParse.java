@@ -175,9 +175,4 @@ public class BcptBeanParse extends AbstractParser<BCModel> {
 		return args;
 	}
 
-	@Override
-	protected String[] getCptName(String paramString) {
-		return null;
-	}
-
 }

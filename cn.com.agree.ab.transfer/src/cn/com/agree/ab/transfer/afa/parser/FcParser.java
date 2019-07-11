@@ -203,11 +203,4 @@ public class FcParser extends AbstractParser<FCModel> {
 		return args;
 	}
 
-
-	@Override
-	protected String[] getCptName(String paramString) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }
