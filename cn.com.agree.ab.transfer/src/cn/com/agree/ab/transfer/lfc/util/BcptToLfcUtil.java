@@ -1,8 +1,10 @@
 package cn.com.agree.ab.transfer.lfc.util;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import cn.com.agree.ab.transfer.afa.model.Arg;
@@ -38,10 +40,19 @@ public class BcptToLfcUtil {
 	 * bcpt中中转节点，可能存在多个
 	 */
 	private Map<String, String> change_id = new ConcurrentHashMap<String, String>();
+	
+	/**
+	 * id对应node节点
+	 */
+	private Map<String, NodeModel> NodeMap = new ConcurrentHashMap<String, NodeModel>();
+	
+	/**
+	 * 默认逻辑错误委托需要删除的组件id
+	 */
+	private Set<String> default_error = new HashSet<String>();
 
 	private String default_id;
 	private String default_next_id;
-	private String default_error_id;
 	private String bcptName;
 
 	/**
@@ -63,6 +74,7 @@ public class BcptToLfcUtil {
 
 	// 从传入的BCModel获取参数传入lfc
 	public LogicFlowControl parse(BCModel bcModel) {
+		NodeMap = getAllNodeId(bcModel);
 		LogicFlowControl lfc = new LogicFlowControl();
 		lfc.getFileDescription().setAuthor(bcModel.getAuth());
 		lfc.getFileDescription().setFunction(bcModel.getName());
@@ -86,7 +98,7 @@ public class BcptToLfcUtil {
 		getSpecialNodeId(bcModel);
 		for (NodeModel nodeModel : bcModel.getNodeModels()) {
 
-			if (nodeModel.getIdString().equals(default_error_id)) {
+			if (default_error.contains(nodeModel.getIdString())) {
 				continue;
 			}
 			int type = nodeModel.getType();
@@ -171,11 +183,40 @@ public class BcptToLfcUtil {
 				// 默认逻辑错误委托
 				default_id = nodeModel.getIdString();
 				default_next_id = getNextId(nodeModel, "成功");
-				default_error_id = getNextId(nodeModel, "失败");
+				default_error = getNextSetId(getNextId(nodeModel, "失败"));
 			}
 		}
 	}
 
+	/**
+	 * 存储所有node对应id节点
+	 */
+	public Map<String, NodeModel> getAllNodeId(BCModel bcModel) {
+		Map<String, NodeModel> nodeMap = new ConcurrentHashMap<String, NodeModel>();
+		for (NodeModel nodeModel : bcModel.getNodeModels()) {
+			nodeMap.put(nodeModel.getIdString(), nodeModel);
+		}
+		return nodeMap;
+	}
+
+	/**
+	 * 获取该节点已经后续所有节点id
+	 */
+	public Set<String> getNextSetId(String id) {
+		Set<String> idSet = new HashSet<String>();
+		idSet.add(id);
+		NodeModel nodeModel = NodeMap.get(id);
+		List<TerminalsMode> terminals = nodeModel.getTerminals();
+		if (terminals.size() != 0) {
+			for (TerminalsMode terminalsMode : terminals) {
+				if (terminalsMode.getTargetNodeId() != null) {
+					idSet.addAll(getNextSetId(terminalsMode.getTargetNodeId()));
+				}
+			}
+		}
+		return idSet;
+	}
+	
 	/**
 	 * 获取指定Node的具体出口
 	 * 
