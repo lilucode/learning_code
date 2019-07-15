@@ -8,6 +8,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 import com.alibaba.fastjson.JSON;
 
 import cn.com.agree.ab.transfer.afa.model.FCModel;
@@ -25,15 +27,15 @@ public class FcToLfcMain {
 
 //		args = new String[] { "demo-s", "./fc/" };
 //		args = new String[] { "demo-s", "D:\\software\\afa\\5.0交易源码\\afa" };
-		if (args.length != 2) {
-			System.err.println("传入参数不合法，需要传入两个参数，含义分别为：项目名、要转换的文件夹路径");
-			return;
-		}
+//		if (args.length != 2) {
+//			System.err.println("传入参数不合法，需要传入两个参数，含义分别为：项目名、要转换的文件夹路径");
+//			return;
+//		}
 		projectName = args[0];
 		ArrayList<File> listFiles = new ArrayList<File>();
 		File baseFile = new File(args[1]);
 		if (!baseFile.exists()) {
-			System.err.println(baseFile.getAbsolutePath() + "不存在");
+			JOptionPane.showMessageDialog(null,baseFile.getAbsolutePath() + "不存在");
 			return;
 		}
 		getAllFile(baseFile, listFiles);
@@ -77,7 +79,8 @@ public class FcToLfcMain {
 				}
 			}
 		}
-		System.out.println("fc转换lfc总共生成文件：" + j + "，生成的文件目录为：" + lfcFile.getAbsolutePath());
+//		System.out.println("fc转换lfc总共生成文件：" + j + "，生成的文件目录为：" + lfcFile.getAbsolutePath());
+		JOptionPane.showMessageDialog(null, "fc转换lfc总共生成文件：" + j + "，生成的文件目录为：" + lfcFile.getAbsolutePath());
 	}
 
 	public static void getAllFile(File baseFile, List<File> listFile) {

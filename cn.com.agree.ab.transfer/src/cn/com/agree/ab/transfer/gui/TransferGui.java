@@ -28,27 +28,27 @@ public class TransferGui extends JFrame {
 
 		Container container = mainForm.getContentPane();
 		/* 设置主窗体属性 */
-		mainForm.setSize(400, 350);// 设置主窗体大小
+		mainForm.setSize(580, 360);// 设置主窗体大小
 		mainForm.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);// 设置主窗体关闭按钮样式
 		mainForm.setLocationRelativeTo(null);// 设置居于屏幕中央
-		mainForm.setResizable(false);// 设置窗口不可缩放
+		mainForm.setResizable(true);// 设置窗口不可缩放
 		mainForm.setLayout(null);
 		mainForm.setVisible(true);// 显示窗口
 		/* 设置各元素位置布局 */
 		combol.setBounds(30, 10, 160, 50);
 		label1.setBounds(30, 70, 300, 30);
-		sourcefile.setBounds(30, 110, 260, 30);
-		buttonBrowseSource.setBounds(300, 110, 60, 30);
+		sourcefile.setBounds(30, 110, 400, 30);
+		buttonBrowseSource.setBounds(440, 110, 60, 30);
 		label2.setBounds(30, 160, 300, 30);
 		projectName.setBounds(30, 190, 200, 30);
-		buttonTransfer.setBounds(120, 250, 160, 30);
+		buttonTransfer.setBounds(220, 260, 160, 30);
 		combol.setBorder(BorderFactory.createTitledBorder("转换方式："));
 		/* 为各元素绑定事件监听器 */
 		buttonBrowseSource.addActionListener(new BrowseAction()); // 为源文件浏览按钮绑定监听器，点击该按钮调用文件选择窗口
 		// 为目标位置浏览按钮绑定监听器，点击该按钮调用文件选择窗口
 		buttonTransfer.addActionListener(new TransferAction()); 
 		// buttonDecrypt.addActionListener(new DecryptAction()); //
-		sourcefile.setEditable(false);// 设置源文件文本域不可手动修改
+//		sourcefile.setEditable(false);// 设置源文件文本域不可手动修改
 		// targetfile.setEditable(false);// 设置目标位置文本域不可手动修改
 		container.add(combol);
 		container.add(label1);

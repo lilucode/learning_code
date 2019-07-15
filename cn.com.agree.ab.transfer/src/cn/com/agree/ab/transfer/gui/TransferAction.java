@@ -17,14 +17,13 @@ public class TransferAction implements ActionListener {
 			JOptionPane.showMessageDialog(null, "请输入转换后项目名！");
 		} else {
 			String select = (String) TransferGui.combol.getSelectedItem();
-			String sourcepath = TransferGui.sourcefile.getText();
+			String sourcePath = TransferGui.sourcefile.getText();
 			String projectName = TransferGui.projectName.getText();
 			try {
 				if (select.equals("bcpt转换lfc")) {
-					BcptToLfcMain
-							.main(new String[] { projectName, sourcepath });
+					BcptToLfcMain.main(new String[] { projectName, sourcePath });
 				} else {
-					FcToLfcMain.main(new String[] { projectName, sourcepath });
+					FcToLfcMain.main(new String[] { projectName, sourcePath});
 				}
 			} catch (Exception e1) {
 				e1.printStackTrace();

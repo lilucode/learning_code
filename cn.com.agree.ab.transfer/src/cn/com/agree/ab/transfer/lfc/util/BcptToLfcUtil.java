@@ -122,6 +122,7 @@ public class BcptToLfcUtil {
 					} catch (Exception e) {
 
 						System.out.println(bcptName + ":" + bcModel.getName() + "包含的业务组件源文件已被删除");
+						BcptToLfcMain.sb.append(bcptName + ":" + bcModel.getName() + "包含的业务组件源文件已被删除\n");
 						lce.setLfcPath("业务组件源文件已被删除");
 					}
 				} else {
