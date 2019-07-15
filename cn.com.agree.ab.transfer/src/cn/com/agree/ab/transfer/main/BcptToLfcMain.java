@@ -27,12 +27,7 @@ public class BcptToLfcMain {
 
 	public static void main(String[] args) throws Exception {
 //		args=new String[] {"demo-s","./bcpt/"};
-//		args=new String[] {"demo-s","D:\\software\\afa\\5.0交易源码\\afa\\functionModule\\businessComponent"};
 		
-//		if (args.length != 2) {
-//			System.err.println("传入参数不合法，需要传入两个参数，含义分别为：项目名、要转换的文件夹路径");
-//			return;
-//		}
 		projectName = args[0];
 
 		ArrayList<File> listFiles = new ArrayList<File>();

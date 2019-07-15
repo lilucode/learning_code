@@ -1,0 +1,642 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Root>
+  
+  <UUID>DBF49ED183E7423CBE65B7BE56CD1F96</UUID>
+  
+  <DateInfo>
+    
+    <CreateDate>2018-10-31 09:16</CreateDate>
+    
+    <ModifyDate>2018-11-02 10:40</ModifyDate>
+  
+  </DateInfo>
+  
+  <NodeMaxnimum>60</NodeMaxnimum>
+  
+  <Regulation>
+    
+    <Step>
+      
+      <UUID>D74E4F9466CA49EBA5BB70264FF42241</UUID>
+      
+      <Quote>0</Quote>
+      
+      <Type>5</Type>
+      
+      <Id>1</Id>
+      
+      <Desp>逻辑处理</Desp>
+      
+      <Auth>25284</Auth>
+      
+      <RefImpl>逻辑处理</RefImpl>
+      
+      <ToolTip/>
+      
+      <Remarks>0</Remarks>
+      
+      <Skip>
+        
+        <Enabled>0</Enabled>
+        
+        <Branch>1</Branch>
+      
+      </Skip>
+      
+      <HasSql>false</HasSql>
+      
+      <Constraint>
+        
+        <Location>160,220</Location>
+        
+        <Size>160,46</Size>
+      
+      </Constraint>
+      
+      <Security>
+        
+        <Readonly>689991A882CC0D94</Readonly>
+        
+        <TokenLevel>BB8F0DEBC8467C05</TokenLevel>
+      
+      </Security>
+      
+      <SourceConnections/>
+      
+      <Implementation>
+        
+        <Node>
+          
+          <Id>5</Id>
+          
+          <Name>正常结束</Name>
+          
+          <Desp>正常结束</Desp>
+          
+          <Sql/>
+          
+          <Type>3</Type>
+          
+          <Target>END</Target>
+          
+          <Style>0</Style>
+          
+          <Tooltip>正常结束</Tooltip>
+          
+          <Visible>1</Visible>
+          
+          <Collapse>0</Collapse>
+          
+          <Constraint>
+            
+            <Location>420,420</Location>
+            
+            <Size>63,63</Size>
+          
+          </Constraint>
+          
+          <SourceConnections/>
+          
+          <InArgs/>
+          
+          <OutArgs/>
+          
+          <Logic>
+            
+            <Total>0</Total>
+          
+          </Logic>
+        
+        </Node>
+        
+        <Node>
+          
+          <Id>1</Id>
+          
+          <Name>开始</Name>
+          
+          <Desp>开始</Desp>
+          
+          <Type>2</Type>
+          
+          <Target>Begin</Target>
+          
+          <Style>0</Style>
+          
+          <Tooltip>开始</Tooltip>
+          
+          <Visible>null</Visible>
+          
+          <Collapse>0</Collapse>
+          
+          <Constraint>
+            
+            <Location>240,100</Location>
+            
+            <Size>63,63</Size>
+          
+          </Constraint>
+          
+          <SourceConnections>
+            
+            <Connection>
+              
+              <targetId>2</targetId>
+              
+              <SourceTerminal>1</SourceTerminal>
+              
+              <TargetTerminal>N</TargetTerminal>
+            
+            </Connection>
+          
+          </SourceConnections>
+          
+          <Terminals>
+            
+            <Terminal>
+              
+              <Name>1</Name>
+              
+              <Desp>锚点一</Desp>
+            
+            </Terminal>
+          
+          </Terminals>
+          
+          <InArgs/>
+          
+          <OutArgs/>
+          
+          <Logic>
+            
+            <Total>1</Total>
+            
+            <RET1>2</RET1>
+          
+          </Logic>
+        
+        </Node>
+        
+        <Node>
+          
+          <Id>2</Id>
+          
+          <Name>默认逻辑错误委托</Name>
+          
+          <Desp>默认逻辑错误委托</Desp>
+          
+          <Type>6</Type>
+          
+          <Target>DefaultException</Target>
+          
+          <Style>2</Style>
+          
+          <Tooltip>默认逻辑错误委托</Tooltip>
+          
+          <Visible>1</Visible>
+          
+          <Collapse>2</Collapse>
+          
+          <Constraint>
+            
+            <Location>240,186</Location>
+            
+            <Size>160,46</Size>
+          
+          </Constraint>
+          
+          <SourceConnections>
+            
+            <Connection>
+              
+              <targetId>6</targetId>
+              
+              <SourceTerminal>0</SourceTerminal>
+              
+              <TargetTerminal>N</TargetTerminal>
+            
+            </Connection>
+            
+            <Connection>
+              
+              <targetId>4</targetId>
+              
+              <SourceTerminal>1</SourceTerminal>
+              
+              <TargetTerminal>N</TargetTerminal>
+            
+            </Connection>
+          
+          </SourceConnections>
+          
+          <Terminals>
+            
+            <Terminal>
+              
+              <Name>0</Name>
+              
+              <Desp>失败</Desp>
+            
+            </Terminal>
+            
+            <Terminal>
+              
+              <Name>1</Name>
+              
+              <Desp>成功</Desp>
+            
+            </Terminal>
+          
+          </Terminals>
+          
+          <InArgs/>
+          
+          <OutArgs/>
+          
+          <Logic>
+            
+            <Total>2</Total>
+            
+            <RET0>6</RET0>
+            
+            <RET1>4</RET1>
+          
+          </Logic>
+        
+        </Node>
+        
+        <Node>
+          
+          <Ref>662DB2424732FACDF3B99CFF9D82022E</Ref>
+          
+          <Id>6</Id>
+          
+          <Name>取全局错误到容器</Name>
+          
+          <Desp>取全局错误到容器</Desp>
+          
+          <Level>0</Level>
+          
+          <Group>平台内嵌类组件</Group>
+          
+          <Sql/>
+          
+          <Type>11</Type>
+          
+          <Target>cn.com.agree.afa.jcomponent.GlobalErrorHolder.putGlobalErrorToDict</Target>
+          
+          <FilePath>/functionModule/technologyComponent/platform/registerInfo/平台内嵌类组件/取全局错误到容器.tcpt</FilePath>
+          
+          <Style>3</Style>
+          
+          <Tooltip>取全局错误到容器</Tooltip>
+          
+          <Skip>
+            
+            <Enabled>0</Enabled>
+            
+            <Branch>1</Branch>
+          
+          </Skip>
+          
+          <IsDebug>0</IsDebug>
+          
+          <Debug>
+            
+            <Codes>
+              
+              <Total>0</Total>
+            
+            </Codes>
+            
+            <Result>1</Result>
+            
+            <Return/>
+            
+            <ReturnList/>
+          
+          </Debug>
+          
+          <Constraint>
+            
+            <Location>143,279</Location>
+            
+            <Size>160,46</Size>
+          
+          </Constraint>
+          
+          <Async>0</Async>
+          
+          <SourceConnections>
+            
+            <Connection>
+              
+              <targetId>7</targetId>
+              
+              <SourceTerminal>1</SourceTerminal>
+              
+              <TargetTerminal>N</TargetTerminal>
+            
+            </Connection>
+          
+          </SourceConnections>
+          
+          <Terminals>
+            
+            <Terminal>
+              
+              <Name>0</Name>
+              
+              <Desp>失败</Desp>
+            
+            </Terminal>
+            
+            <Terminal>
+              
+              <Name>1</Name>
+              
+              <Desp>成功</Desp>
+            
+            </Terminal>
+          
+          </Terminals>
+          
+          <InArgs>
+            
+            <Arg>
+              
+              <Name>装载所要获取的全局错误的JavaDict容器</Name>
+              
+              <Key>dict</Key>
+              
+              <Arg>__REQ__</Arg>
+              
+              <Level>4</Level>
+              
+              <Type>cn.com.agree.afa.svc.javaengine.context.JavaDict</Type>
+            
+            </Arg>
+            
+            <Arg>
+              
+              <Name>错误类型对应的关键字Key</Name>
+              
+              <Key>errorTypeKey</Key>
+              
+              <Arg>"p_excptype"</Arg>
+              
+              <Level>4</Level>
+              
+              <Type>java.lang.String</Type>
+            
+            </Arg>
+            
+            <Arg>
+              
+              <Name>错误代码对应的关键字Key</Name>
+              
+              <Key>errorCodeKey</Key>
+              
+              <Arg>"p_ret_code"</Arg>
+              
+              <Level>4</Level>
+              
+              <Type>java.lang.String</Type>
+            
+            </Arg>
+            
+            <Arg>
+              
+              <Name>错误信息对应的关键字Key</Name>
+              
+              <Key>errorMsgKey</Key>
+              
+              <Arg>"p_ret_desc"</Arg>
+              
+              <Level>4</Level>
+              
+              <Type>java.lang.String</Type>
+            
+            </Arg>
+          
+          </InArgs>
+          
+          <OutArgs/>
+          
+          <AspectUsed>0</AspectUsed>
+          
+          <Logic>
+            
+            <Total>1</Total>
+            
+            <RET1>7</RET1>
+          
+          </Logic>
+        
+        </Node>
+        
+        <Node>
+          
+          <Id>7</Id>
+          
+          <Name>异常结束</Name>
+          
+          <Desp>异常结束</Desp>
+          
+          <Sql/>
+          
+          <Type>4</Type>
+          
+          <Target>END</Target>
+          
+          <Style>0</Style>
+          
+          <Tooltip>异常结束</Tooltip>
+          
+          <Visible>1</Visible>
+          
+          <Collapse>0</Collapse>
+          
+          <Constraint>
+            
+            <Location>140,400</Location>
+            
+            <Size>63,63</Size>
+          
+          </Constraint>
+          
+          <SourceConnections/>
+          
+          <InArgs/>
+          
+          <OutArgs/>
+          
+          <Logic>
+            
+            <Total>0</Total>
+          
+          </Logic>
+        
+        </Node>
+        
+        <Node>
+          
+          <Ref>8DB44FA164F81B3990909B28C4592215</Ref>
+          
+          <Id>4</Id>
+          
+          <Name>参数内存化</Name>
+          
+          <Desp>参数内存化</Desp>
+          
+          <Level>1</Level>
+          
+          <Group>参数内存化</Group>
+          
+          <Sql/>
+          
+          <Type>11</Type>
+          
+          <Target>tc.bank.product.B_ParamMemory.B_ParamterMemory</Target>
+          
+          <FilePath>/functionModule/technologyComponent/bank/registerInfo/参数内存化/参数内存化.tcpt</FilePath>
+          
+          <Style>3</Style>
+          
+          <Tooltip/>
+          
+          <Skip>
+            
+            <Enabled>0</Enabled>
+            
+            <Branch>1</Branch>
+          
+          </Skip>
+          
+          <IsDebug>0</IsDebug>
+          
+          <Debug>
+            
+            <Codes>
+              
+              <Total>0</Total>
+            
+            </Codes>
+            
+            <Result>1</Result>
+            
+            <Return/>
+            
+            <ReturnList/>
+          
+          </Debug>
+          
+          <Constraint>
+            
+            <Location>360,300</Location>
+            
+            <Size>160,46</Size>
+          
+          </Constraint>
+          
+          <Async>0</Async>
+          
+          <SourceConnections>
+            
+            <Connection>
+              
+              <targetId>5</targetId>
+              
+              <SourceTerminal>1</SourceTerminal>
+              
+              <TargetTerminal>N</TargetTerminal>
+            
+            </Connection>
+          
+          </SourceConnections>
+          
+          <Terminals>
+            
+            <Terminal>
+              
+              <Name>0</Name>
+              
+              <Desp>失败</Desp>
+            
+            </Terminal>
+            
+            <Terminal>
+              
+              <Name>1</Name>
+              
+              <Desp>成功</Desp>
+            
+            </Terminal>
+          
+          </Terminals>
+          
+          <InArgs>
+            
+            <Arg>
+              
+              <Name>是否进行版本校验</Name>
+              
+              <Key>isCheck</Key>
+              
+              <Arg>"1"</Arg>
+              
+              <Level>2</Level>
+              
+              <Type>java.lang.String</Type>
+            
+            </Arg>
+          
+          </InArgs>
+          
+          <OutArgs/>
+          
+          <AspectUsed>0</AspectUsed>
+          
+          <Logic>
+            
+            <Total>1</Total>
+            
+            <RET1>5</RET1>
+          
+          </Logic>
+        
+        </Node>
+        
+        <Usage>1</Usage>
+      
+      </Implementation>
+      
+      <Terminals>
+        
+        <Terminal>
+          
+          <Name>0</Name>
+          
+          <Desp>失败</Desp>
+        
+        </Terminal>
+        
+        <Terminal>
+          
+          <Name>1</Name>
+          
+          <Desp>成功</Desp>
+        
+        </Terminal>
+      
+      </Terminals>
+      
+      <True>0</True>
+      
+      <False>0</False>
+    
+    </Step>
+  
+  </Regulation>
+</Root>

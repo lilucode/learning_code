@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Flag> 
+  <Version>1.0.0</Version>  
+  <Name>__Initializer__</Name>  
+  <Desc>默认服务初次化钩子场景</Desc>  
+  <Author>null</Author>  
+  <ExecuteOnWGStartup>0</ExecuteOnWGStartup>  
+  <ExecuteOnServiceStartup>1</ExecuteOnServiceStartup>
+</Flag>

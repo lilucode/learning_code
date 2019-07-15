@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ServiceArg>
+	
+  
+  
+  <UUID>A916F427FF3D473AB87523D8D67A48BA</UUID>
+	
+  
+  
+  <InArg/>
+	
+  
+  
+  <OutArg/>
+  
+  <ServiceName>INITCACHE</ServiceName>
+  
+  <ServiceDesc>内存初始化定时调度</ServiceDesc>
+  
+  <JarName>PUBLIC.INITCACHE.jar</JarName>
+  
+  <MainClass>PUBLIC.INITCACHE.TINITCACHE</MainClass>
+</ServiceArg>

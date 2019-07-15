@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Flag>
+	
+  
+  <Version>1.0</Version>
+	
+  
+  <Name>PUBLIC</Name>
+	
+  
+  <Desp>公共处理数据库穿透、后台通讯穿透性服务</Desp>
+	
+  
+  <Author>null</Author>
+	
+  
+  <CreateTime>2018年11月21日 9:05:15</CreateTime>
+	
+  
+  <DefaultLogLevel>4</DefaultLogLevel>
+  <Servitization>true</Servitization>
+</Flag>

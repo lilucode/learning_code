@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Flag>
+	
+  <Version>1.0.0</Version>
+	
+  <Name/>
+	
+  <Desc>提供平台回调的钩子场景</Desc>
+</Flag>

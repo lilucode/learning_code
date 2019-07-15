@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Flag>
+	
+  <Version>1.0.0</Version>
+	
+  <Name>__ParamUpdater__</Name>
+	
+  <Desc>服务参数更新场景</Desc>
+	
+  <Author>null</Author>
+	
+  <ExecuteOnWGStartup>0</ExecuteOnWGStartup>
+</Flag>

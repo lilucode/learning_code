@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Free>
+  <ReqPack>00000456               Cache           INITCACHE{"SYS_HEAD":{"Reserve":"","SceneCode":"","SysId":"","ServerIP":"","ChannelCode":"01","RequestTime":"172330","Oid":"","AppNum":"TE","TranMode":"1","WorkTime":"20181122172330","AbsNo":"","MacValue":"","RequestDate":"20181122","ConsumerSeqNo":"ABSLogClear20181122172330001","ConsumerIP":"","ConsumerId":"01","CommCode":"","TransServiceCode":"cip.fss.d026.01","tradeId":""},"BODY":{"DeviceNo":"1","Brno":"3344"}}</ReqPack>
+</Free>

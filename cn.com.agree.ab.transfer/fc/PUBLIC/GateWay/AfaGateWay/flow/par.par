@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ServiceArg>
+	
+  
+  <UUID>A03AFB921B534E3F829C2FB7AB5A2E1C</UUID>
+	
+  
+  <InArg/>
+	
+  
+  <OutArg/>
+  <ServiceName>AfaGateWay</ServiceName>
+  <ServiceDesc>afa接入网关</ServiceDesc>
+  <JarName>GateWay.AfaGateWay.jar</JarName>
+  <MainClass>GateWay.AfaGateWay.TAfaGateWay</MainClass>
+</ServiceArg>

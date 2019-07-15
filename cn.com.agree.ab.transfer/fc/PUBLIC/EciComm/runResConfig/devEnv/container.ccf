@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<container>
+  <id>5</id>
+  <name>EciComm</name>
+  <description>默认</description>
+  <startupMode>0</startupMode>
+  <jvmOptions></jvmOptions>
+  <startTimeout>180000</startTimeout>
+  <stopTimeout>60000</stopTimeout>
+  <reportInterval>2000</reportInterval>
+  <isolation>false</isolation>
+  <startUpHookTrades/>
+  <lsrs>
+    <lsr id="1" name="接入适配器">
+      <description></description>
+      <services>
+        <service id="1" name="微服务SDK_HTTP协议" type="15">
+          <description>微服务SDK_HTTP协议</description>
+          <identifier>EciComm_HTTP_SDK_IN</identifier>
+          <isolation>false</isolation>
+          <defaultMC></defaultMC>
+          <defaultTC></defaultTC>
+          <packetType></packetType>
+          <sdkOptions>
+            <systemCode>PUBLIC</systemCode>
+            <registryType>eureka</registryType>
+            <registryAddr></registryAddr>
+            <configCenterAddr></configCenterAddr>
+            <protocol>
+              <property name="category" value="http"/>
+              <property name="port" value="10010"/>
+              <property name="ioThreads" value="6"/>
+              <property name="transportType" value="short"/>
+            </protocol>
+          </sdkOptions>
+        </service>
+      </services>
+      <flowControl>
+        <usable>true</usable>
+        <whitelist/>
+      </flowControl>
+    </lsr>
+  </lsrs>
+  <outs>
+    <out id="1" name="接出适配器">
+      <description></description>
+      <services>
+        <service id="1" name="微服务SDK_HTTP协议" type="16">
+          <description>微服务SDK_HTTP协议</description>
+          <identifier>EciComm_HTTP_SDK_OUT</identifier>
+          <sdkOutOptions>
+            <systemCode>PUBLIC</systemCode>
+            <registryType>eureka</registryType>
+            <registryAddr></registryAddr>
+            <configCenterAddr></configCenterAddr>
+            <protocol>
+              <property name="category" value="abus"/>
+              <property name="ioThreads" value="8"/>
+              <property name="transportType" value="long"/>
+            </protocol>
+          </sdkOutOptions>
+        </service>
+      </services>
+    </out>
+  </outs>
+  <svc>
+    <engineType>1</engineType>
+    <loadType>0</loadType>
+    <hotDeployment>true</hotDeployment>
+    <preloadScript>true</preloadScript>
+    <proxy>false</proxy>
+    <scriptPaths/>
+    <dbConnPools>
+      <dbConnPool id="" name="dev" type="0" encipherVersion="1">
+        <property name="User" value="sdbadmin"/>
+        <property name="Password" value="o1R4NipOnKc="/>
+        <property name="JdbcUrl" value="jdbc:mysql://192.168.187.90:3306/dev"/>
+        <property name="DriverClass" value="com.mysql.jdbc.Driver"/>
+        <property name="InitialPoolSize" value="16"/>
+        <property name="MinPoolSize" value="16"/>
+        <property name="MaxPoolSize" value="48"/>
+        <property name="AcquireIncrement" value="8"/>
+        <property name="AcquireRetryAttempts" value="1"/>
+        <property name="AcquireRetryDelay" value="1000"/>
+        <property name="MaxIdleTime" value="1800"/>
+        <property name="MaxIdleTimeExcessConnections" value="0"/>
+        <property name="MaxConnectionAge" value="0"/>
+        <property name="CheckoutTimeout" value="0"/>
+        <property name="AutoCommitOnClose" value="false"/>
+        <property name="BreakAfterAcquireFailure" value="false"/>
+        <property name="MaxStatements" value="0"/>
+        <property name="MaxStatementsPerConnection" value="0"/>
+        <property name="PropertyCycle" value="0"/>
+        <property name="UnreturnedConnectionTimeout" value="0"/>
+        <property name="NumHelperThreads" value="3"/>
+      </dbConnPool>
+    </dbConnPools>
+    <shareDbConnPools/>
+    <hibernate/>
+    <mybatis/>
+    <applog>
+      <recordMode>0</recordMode>
+      <traceEnabled>true</traceEnabled>
+      <debugEnabled>true</debugEnabled>
+      <inforEnabled>true</inforEnabled>
+      <errorEnabled>true</errorEnabled>
+      <dumpEnabled>true</dumpEnabled>
+      <bufferSize>16k</bufferSize>
+      <maxFileSize>32m</maxFileSize>
+      <maxFileCount>1000</maxFileCount>
+      <rootPath></rootPath>
+      <dateDirMode>0</dateDirMode>
+      <filterMode>0</filterMode>
+      <fileEncoding>utf-8</fileEncoding>
+      <redirectError>false</redirectError>
+      <redundant>false</redundant>
+      <backup>false</backup>
+      <provider>cn.com.agree.afa.applog.logger.FileLoggerProvider</provider>
+      <fileNameSuffix></fileNameSuffix>
+      <kafka/>
+      <customizedTrades/>
+      <net>
+        <connectTimeout>5000</connectTimeout>
+        <idleTime>60000</idleTime>
+        <connections>10</connections>
+        <ioThreads>0</ioThreads>
+        <address></address>
+        <port></port>
+      </net>
+      <async>
+        <useable>false</useable>
+        <corePoolSize>1</corePoolSize>
+        <maximumPoolSize>3</maximumPoolSize>
+        <queueSize>500</queueSize>
+      </async>
+    </applog>
+    <threadPool>
+      <corePoolSize>32</corePoolSize>
+      <maxPoolSize>64</maxPoolSize>
+      <keepAliveTime>60000</keepAliveTime>
+      <queueSize>320</queueSize>
+      <persistent>
+        <open>false</open>
+        <asyncFlush>true</asyncFlush>
+        <saveDirectory></saveDirectory>
+        <serializationClass></serializationClass>
+        <mappedFileSize>2147483647</mappedFileSize>
+        <flushPages>4</flushPages>
+        <deleteExpiredMappedFileCron>0 0 3 * * ?</deleteExpiredMappedFileCron>
+        <loadFactor>0.5</loadFactor>
+        <fillFactor>1.0</fillFactor>
+        <syncFlushTimeout>180000</syncFlushTimeout>
+      </persistent>
+    </threadPool>
+    <paramMemorize>
+      <usable>false</usable>
+      <paramSources/>
+    </paramMemorize>
+    <monitorTrade>
+      <usable>false</usable>
+      <trades/>
+    </monitorTrade>
+    <oneTradeMonitor>
+      <open>false</open>
+      <customizedItems/>
+    </oneTradeMonitor>
+  </svc>
+  <dcm>
+     <services>
+      <service id="1" name="Redis缓存服务" type="1">
+        <description>Redis缓存服务</description>
+        <identifier></identifier>
+        <redisOptions>
+          <caches>
+            <cache name="cache">
+              <password></password>
+              <maxTotal>10</maxTotal>
+              <maxIdle>600</maxIdle>
+              <minIdle>300</minIdle>
+              <sentinels>
+                <sentinel>192.168.187.90:20001</sentinel>
+              </sentinels>
+              <masterNames>
+                <masterName>mymaster1</masterName>
+              </masterNames>
+            </cache>
+          </caches>
+        </redisOptions>
+      </service>
+    </services>
+  </dcm>
+  <activiti>
+    <description></description>
+    <loadType>1</loadType>
+    <hotDeployment>true</hotDeployment>
+    <asyncExecutorEnabled>true</asyncExecutorEnabled>
+    <asyncExecutorActivate>true</asyncExecutorActivate>
+    <configurationAdapter></configurationAdapter>
+    <dataSource databaseType="" databaseSchemaUpdate="" encipherVersion="0"/>
+  </activiti>
+  <modifyDate>20181203165241</modifyDate>
+</container>

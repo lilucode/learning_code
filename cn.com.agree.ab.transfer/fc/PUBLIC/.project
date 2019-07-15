@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>PUBLIC</name>
+	<comment>公共处理数据库穿透、后台通讯穿透性服务</comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>cn.com.agree.ide.afa.flow.builder.ProjectBuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>cn.com.agree.ide.afa.tc.java.builder.TCBuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.eclipse.jdt.core.javanature</nature>
+		<nature>project</nature>
+	</natures>
+</projectDescription>

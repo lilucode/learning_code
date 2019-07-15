@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Flag>
+	
+  <Version>1.0.0</Version>
+	
+  <Name>INITCACHE</Name>
+	
+  <Desc>将缓存写入redis</Desc>
+	
+  <Author>null</Author>
+	
+  <ExecuteOnWGStartup>0</ExecuteOnWGStartup>
+</Flag>
