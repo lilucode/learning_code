@@ -2,10 +2,6 @@ package cn.com.agree.ab.transfer.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 
 import javax.swing.JOptionPane;
 
@@ -17,12 +13,12 @@ public class TransferAction implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		if (TransferGui.sourcefile.getText().isEmpty()) {
 			JOptionPane.showMessageDialog(null, "请选择待转换文件！");
-		} else if (TransferGui.targetfile.getText().isEmpty()) {
-			JOptionPane.showMessageDialog(null, "请选择转换后文件存放目录！");
+		} else if (TransferGui.projectName.getText().isEmpty()) {
+			JOptionPane.showMessageDialog(null, "请输入转换后项目名！");
 		} else {
 			String select = (String) TransferGui.combol.getSelectedItem();
 			String sourcepath = TransferGui.sourcefile.getText();
-			String projectName = TransferGui.targetfile.getText();
+			String projectName = TransferGui.projectName.getText();
 			try {
 				if (select.equals("bcpt转换lfc")) {
 					BcptToLfcMain

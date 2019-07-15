@@ -82,6 +82,9 @@ public class FcToLfcMain {
 
 	public static void getAllFile(File baseFile, List<File> listFile) {
 		File[] files = baseFile.listFiles();
+		if (files == null) {
+			return;
+		}
 		for (File sub : files) {
 			if (sub.isDirectory() && !sub.getName().startsWith("_")) {
 				getAllFile(sub, listFile);

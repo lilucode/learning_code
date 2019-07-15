@@ -80,6 +80,9 @@ public class BcptToLfcMain {
 
 	public static void getAllFile(File baseFile, List<File> listFile) {
 		File[] files = baseFile.listFiles();
+		if (files == null) {
+			return;
+		}
 		for (File sub : files) {
 			if (sub.isDirectory()) {
 				getAllFile(sub, listFile);

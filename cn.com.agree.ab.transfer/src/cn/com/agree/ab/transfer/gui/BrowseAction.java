@@ -20,15 +20,5 @@ public class BrowseAction implements ActionListener {
 				TransferGui.sourcefile.setText(filepath);
 			}
 		}
-		// else if (e.getSource().equals(TransferGui.buttonBrowseTarget)) {
-		// JFileChooser fcDlg = new JFileChooser();
-		// fcDlg.setDialogTitle("请选择转换后的文件存放目录");
-		// fcDlg.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		// int returnVal = fcDlg.showOpenDialog(null);
-		// if (returnVal == JFileChooser.APPROVE_OPTION) {
-		// String filepath = fcDlg.getSelectedFile().getPath();
-		// TransferGui.targetfile.setText(filepath);
-		// }
-		// }
 	}
 }

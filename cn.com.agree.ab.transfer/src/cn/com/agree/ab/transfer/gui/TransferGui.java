@@ -14,11 +14,11 @@ public class TransferGui extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	/* 主窗体里面的若干元素 */
-	private JFrame mainForm = new JFrame("生成lfc文件"); // 主窗体，标题为“文件转换”
+	private JFrame mainForm = new JFrame("文件转换"); // 主窗体
 	private JLabel label1 = new JLabel("请选择待转换的文件：");
 	private JLabel label2 = new JLabel("请选择存放lfc文件的项目名：");
 	public static JTextField sourcefile = new JTextField(); // 选择待转换文件路径的文本域
-	public static JTextField targetfile = new JTextField(10); // 选择转换后的项目名称
+	public static JTextField projectName = new JTextField(10); // 选择转换后的项目名称
 	public static JButton buttonBrowseSource = new JButton("浏览"); // 浏览按钮
 	public static JButton buttonTransfer = new JButton("生成.lfc文件"); 
 	public static String[] str = { "bcpt转换lfc", "fc转换lfc" };
@@ -40,7 +40,7 @@ public class TransferGui extends JFrame {
 		sourcefile.setBounds(30, 110, 260, 30);
 		buttonBrowseSource.setBounds(300, 110, 60, 30);
 		label2.setBounds(30, 160, 300, 30);
-		targetfile.setBounds(30, 190, 200, 30);
+		projectName.setBounds(30, 190, 200, 30);
 		buttonTransfer.setBounds(120, 250, 160, 30);
 		combol.setBorder(BorderFactory.createTitledBorder("转换方式："));
 		/* 为各元素绑定事件监听器 */
@@ -54,7 +54,7 @@ public class TransferGui extends JFrame {
 		container.add(label1);
 		container.add(label2);
 		container.add(sourcefile);
-		container.add(targetfile);
+		container.add(projectName);
 		container.add(buttonBrowseSource);
 		container.add(buttonTransfer);
 	}
