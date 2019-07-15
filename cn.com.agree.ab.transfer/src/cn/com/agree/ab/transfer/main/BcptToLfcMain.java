@@ -23,7 +23,7 @@ public class BcptToLfcMain {
 
 	public static void main(String[] args) throws Exception {
 //		args=new String[] {"demo-s","./bcpt/"};
-		args=new String[] {"demo-s","D:\\software\\afa\\5.0交易源码\\afa\\functionModule\\businessComponent"};
+//		args=new String[] {"demo-s","D:\\software\\afa\\5.0交易源码\\afa\\functionModule\\businessComponent"};
 		
 		if (args.length != 2) {
 			System.err.println("传入参数不合法，需要传入两个参数，含义分别为：项目名、要转换的文件夹路径");
@@ -74,7 +74,7 @@ public class BcptToLfcMain {
 				}
 			}
 		}
-		System.out.println("总共生成lfc文件：" + j + "，生成的文件目录为：" + lfcFile.getAbsolutePath());
+		System.out.println("bcpt转换lfc总共生成文件：" + j + "，生成的文件目录为：" + lfcFile.getAbsolutePath());
 
 	}
 
