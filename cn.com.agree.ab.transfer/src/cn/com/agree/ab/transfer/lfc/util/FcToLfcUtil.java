@@ -11,7 +11,6 @@ import java.util.Set;
 
 import com.alibaba.fastjson.JSON;
 
-import cn.com.agree.ab.transfer.afa.model.Arg;
 import cn.com.agree.ab.transfer.afa.model.BCModel;
 import cn.com.agree.ab.transfer.afa.model.BStepModel;
 import cn.com.agree.ab.transfer.afa.model.FCModel;
@@ -19,23 +18,15 @@ import cn.com.agree.ab.transfer.afa.model.NStepModel;
 import cn.com.agree.ab.transfer.afa.model.NodeModel;
 import cn.com.agree.ab.transfer.afa.model.StepModel;
 import cn.com.agree.ab.transfer.main.FcToLfcMain;
-import cn.com.agree.ab.transfer.runtime.lfc.ArgComponent;
-import cn.com.agree.ab.transfer.runtime.lfc.ArgElement;
 import cn.com.agree.ab.transfer.runtime.lfc.ComponentOut;
 import cn.com.agree.ab.transfer.runtime.lfc.Geometry;
 import cn.com.agree.ab.transfer.runtime.lfc.LfcComponentElement;
 import cn.com.agree.ab.transfer.runtime.lfc.LogicFlowControl;
-import cn.com.agree.ab.transfer.value.jj.ParseException;
-import cn.com.agree.ab.transfer.value.jj.REQParser;
 
 
-public class FcToLfcUtil {
+public class FcToLfcUtil extends LfcUtil{
 
 	public String fileName = "";
-
-	private List<String> inArgs = new ArrayList<String>();
-
-	private List<String> outArgs = new ArrayList<String>();
 
 	private List<String> allName = new ArrayList<String>();
 
@@ -122,28 +113,6 @@ public class FcToLfcUtil {
 		}
 		allName.add(name);
 		return name;
-	}
-
-	public List<ArgElement> getArgComponent(List<Arg> Args) {
-		List<ArgElement> list = new ArrayList<ArgElement>();
-		for (Arg componentArg : Args) {
-			ArgComponent ae = new ArgComponent();
-			ae.setName(componentArg.getKey());
-			ae.setCaption(componentArg.getName());
-			ae.setEditor(componentArg.getType());
-			ae.setValue(componentArg.getArg().replaceAll("\n", ""));
-			REQParser parser = new REQParser(ae.getValue());
-			parser.addAllInArg(inArgs);
-			parser.addAllOutArg(outArgs);
-			try {
-				String result = (String) parser.parse();
-				ae.setValue(result);
-			} catch (ParseException e) {
-				System.err.println("报错：" + ae.getValue());
-			}
-			list.add(ae);
-		}
-		return list;
 	}
 
 	public LfcComponentElement setLfcCommon(LfcComponentElement lce, StepModel stepModel) {

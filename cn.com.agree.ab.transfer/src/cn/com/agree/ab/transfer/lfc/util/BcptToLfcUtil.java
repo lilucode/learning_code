@@ -13,7 +13,6 @@ import cn.com.agree.ab.transfer.afa.model.ComponentArg;
 import cn.com.agree.ab.transfer.afa.model.NodeModel;
 import cn.com.agree.ab.transfer.afa.model.TerminalsMode;
 import cn.com.agree.ab.transfer.main.BcptToLfcMain;
-import cn.com.agree.ab.transfer.runtime.lfc.ArgComponent;
 import cn.com.agree.ab.transfer.runtime.lfc.ArgElement;
 import cn.com.agree.ab.transfer.runtime.lfc.ComponentElement;
 import cn.com.agree.ab.transfer.runtime.lfc.ComponentOut;
@@ -21,10 +20,9 @@ import cn.com.agree.ab.transfer.runtime.lfc.Geometry;
 import cn.com.agree.ab.transfer.runtime.lfc.LfcComponentElement;
 import cn.com.agree.ab.transfer.runtime.lfc.LogicFlowControl;
 import cn.com.agree.ab.transfer.runtime.lfc.LogicletComponentElement;
-import cn.com.agree.ab.transfer.value.jj.REQParser;
 
 
-public class BcptToLfcUtil {
+public class BcptToLfcUtil extends LfcUtil{
 
 	/**
 	 * bcpt中正常结束Node，可能存在多个
@@ -54,15 +52,6 @@ public class BcptToLfcUtil {
 	private String default_id;
 	private String default_next_id;
 	private String bcptName;
-
-	/**
-	 * bcpt入参
-	 */
-	private List<String> inArgs = new ArrayList<String>();
-	/**
-	 * bcpt出参
-	 */
-	private List<String> outArgs = new ArrayList<String>();
 
 	public BcptToLfcUtil() {
 		
@@ -331,32 +320,4 @@ public class BcptToLfcUtil {
 		return list;
 	}
 
-	/**
-	 * 技术组件和内嵌lfc的出入参
-	 * 
-	 * @param cInArgs
-	 * @return
-	 */
-	public List<ArgElement> getArgComponent(List<Arg> Args) {
-		List<ArgElement> list = new ArrayList<ArgElement>();
-		for (Arg componentArg : Args) {
-			ArgComponent ae = new ArgComponent();
-			ae.setName(componentArg.getKey());
-			ae.setCaption(componentArg.getName());
-			ae.setEditor(componentArg.getType());
-			ae.setValue(componentArg.getArg().replaceAll("\n", ""));
-			REQParser parser = new REQParser(ae.getValue());
-			parser.addAllInArg(inArgs);
-			parser.addAllOutArg(outArgs);
-			try {
-				String result = (String) parser.parse();
-				ae.setValue(result);
-			} catch (Exception e) {
-				e.printStackTrace();
-				System.err.println("报错：" + ae.getValue());
-			}
-			list.add(ae);
-		}
-		return list;
-	}
 }
