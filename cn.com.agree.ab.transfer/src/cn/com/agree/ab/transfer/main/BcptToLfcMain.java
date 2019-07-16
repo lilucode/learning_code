@@ -14,9 +14,9 @@ import com.alibaba.fastjson.JSON;
 
 import cn.com.agree.ab.transfer.afa.model.BCModel;
 import cn.com.agree.ab.transfer.afa.parser.BcptParse;
-import cn.com.agree.ab.transfer.lfc.util.BcptToLfcUtil;
-import cn.com.agree.ab.transfer.lfc.util.FormatUtil;
 import cn.com.agree.ab.transfer.runtime.lfc.LogicFlowControl;
+import cn.com.agree.ab.transfer.util.BcptToLfcUtil;
+import cn.com.agree.ab.transfer.util.FormatUtil;
 
 
 public class BcptToLfcMain {

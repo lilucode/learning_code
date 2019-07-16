@@ -15,9 +15,9 @@ import com.alibaba.fastjson.JSON;
 import cn.com.agree.ab.transfer.afa.model.FCModel;
 import cn.com.agree.ab.transfer.afa.parser.FcParser;
 import cn.com.agree.ab.transfer.afa.parser.XmlParseException;
-import cn.com.agree.ab.transfer.lfc.util.FcToLfcUtil;
-import cn.com.agree.ab.transfer.lfc.util.FormatUtil;
 import cn.com.agree.ab.transfer.runtime.lfc.LogicFlowControl;
+import cn.com.agree.ab.transfer.util.FcToLfcUtil;
+import cn.com.agree.ab.transfer.util.FormatUtil;
 
 public class FcToLfcMain {
 
