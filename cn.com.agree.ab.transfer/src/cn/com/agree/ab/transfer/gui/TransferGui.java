@@ -47,9 +47,7 @@ public class TransferGui extends JFrame {
 		buttonBrowseSource.addActionListener(new BrowseAction()); // 为源文件浏览按钮绑定监听器，点击该按钮调用文件选择窗口
 		// 为目标位置浏览按钮绑定监听器，点击该按钮调用文件选择窗口
 		buttonTransfer.addActionListener(new TransferAction()); 
-		// buttonDecrypt.addActionListener(new DecryptAction()); //
 //		sourcefile.setEditable(false);// 设置源文件文本域不可手动修改
-		// targetfile.setEditable(false);// 设置目标位置文本域不可手动修改
 		container.add(combol);
 		container.add(label1);
 		container.add(label2);

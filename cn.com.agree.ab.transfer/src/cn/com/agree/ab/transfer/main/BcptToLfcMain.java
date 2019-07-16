@@ -13,7 +13,7 @@ import javax.swing.JOptionPane;
 import com.alibaba.fastjson.JSON;
 
 import cn.com.agree.ab.transfer.afa.model.BCModel;
-import cn.com.agree.ab.transfer.afa.parser.BcptBeanParse;
+import cn.com.agree.ab.transfer.afa.parser.BcptParse;
 import cn.com.agree.ab.transfer.lfc.util.BcptToLfcUtil;
 import cn.com.agree.ab.transfer.lfc.util.FormatUtil;
 import cn.com.agree.ab.transfer.runtime.lfc.LogicFlowControl;
@@ -47,7 +47,7 @@ public class BcptToLfcMain {
 		for (File file : listFiles) {
 			String name = file.getName();
 			if (name.endsWith(".bcpt")) {
-				BcptBeanParse bbp = new BcptBeanParse();
+				BcptParse bbp = new BcptParse();
 				BCModel bm = bbp.parse(file);
 				BcptToLfcUtil blu = new BcptToLfcUtil(file.getAbsolutePath());
 				LogicFlowControl lfc = blu.parse(bm);
