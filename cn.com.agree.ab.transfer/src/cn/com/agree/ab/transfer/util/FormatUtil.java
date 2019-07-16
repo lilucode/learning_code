@@ -1,4 +1,4 @@
-package cn.com.agree.ab.transfer.lfc.util;
+package cn.com.agree.ab.transfer.util;
 
 public class FormatUtil {
 	public static String formatJson(String jsonStr) {

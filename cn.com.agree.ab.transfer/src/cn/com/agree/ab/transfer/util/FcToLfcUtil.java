@@ -1,4 +1,4 @@
-package cn.com.agree.ab.transfer.lfc.util;
+package cn.com.agree.ab.transfer.util;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -78,6 +78,7 @@ public class FcToLfcUtil extends LfcUtil{
 
 				List<NodeModel> nodeList = ((NStepModel) stepModel).getNodeModels();
 				BCModel bcModel = new BCModel();
+				bcModel.setName(refImpl);
 				bcModel.setNodeModels(nodeList);
 				LogicFlowControl newLfc = new LogicFlowControl();
 				BcptToLfcUtil btl = new BcptToLfcUtil();

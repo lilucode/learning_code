@@ -1,4 +1,4 @@
-package cn.com.agree.ab.transfer.lfc.util;
+package cn.com.agree.ab.transfer.util;
 
 import java.util.ArrayList;
 import java.util.List;

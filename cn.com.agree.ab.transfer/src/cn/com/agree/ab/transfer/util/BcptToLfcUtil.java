@@ -1,4 +1,4 @@
-package cn.com.agree.ab.transfer.lfc.util;
+package cn.com.agree.ab.transfer.util;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -13,6 +13,7 @@ import cn.com.agree.ab.transfer.afa.model.ComponentArg;
 import cn.com.agree.ab.transfer.afa.model.NodeModel;
 import cn.com.agree.ab.transfer.afa.model.TerminalsMode;
 import cn.com.agree.ab.transfer.main.BcptToLfcMain;
+import cn.com.agree.ab.transfer.main.FcToLfcMain;
 import cn.com.agree.ab.transfer.runtime.lfc.ArgElement;
 import cn.com.agree.ab.transfer.runtime.lfc.ComponentElement;
 import cn.com.agree.ab.transfer.runtime.lfc.ComponentOut;
@@ -107,7 +108,8 @@ public class BcptToLfcUtil extends LfcUtil{
 						filePath = filePath.substring(0, filePath.lastIndexOf("/"))
 								.replaceAll("/functionModule/businessComponent", "") + "/";
 						// lce.setLfcPath("/demo-s/business" + filePath + target + ".lfc");
-						lce.setLfcPath("/" + BcptToLfcMain.projectName + "/business" + filePath + target + ".lfc");
+						lce.setLfcPath("/" + (BcptToLfcMain.projectName == null ? FcToLfcMain.projectName
+								: BcptToLfcMain.projectName)+ "/business" + filePath + target + ".lfc");
 					} catch (Exception e) {
 
 						System.out.println(bcptName + ":" + bcModel.getName() + "包含的业务组件源文件已被删除");
@@ -122,7 +124,8 @@ public class BcptToLfcUtil extends LfcUtil{
 						}
 					}
 					lce.setLfcPath(
-							"/" + BcptToLfcMain.projectName + "/business/" + dir + "/" + nodeModel.getName() + ".lfc");
+							"/" + (BcptToLfcMain.projectName == null ? FcToLfcMain.projectName
+									: BcptToLfcMain.projectName) + "/business/" + dir + "/" + nodeModel.getName() + ".lfc");
 				}
 				lfc.addLfc(setLfcAndComponent(lce, nodeModel));
 			} else if (type == 2) {
