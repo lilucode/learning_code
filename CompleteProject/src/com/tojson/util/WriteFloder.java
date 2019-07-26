@@ -5,12 +5,12 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-//½«ÎÄ¼şĞ´ÈëÎÄ¼ş¼Ğ
+//å°†æ–‡ä»¶å†™å…¥æ–‡ä»¶å¤¹
 public class WriteFloder {
 	public void main(String fileString,String foldString) throws Exception {
-		//»ñÈ¡Ä¿±êÎÄ¼ş¼Ğ
-		File file = new File(fileString);//ÎÄ¼şÔ­Ä¿Â¼
-		File destDir = new File(foldString);//ÎÄ¼ş¼ĞÄ¿Â¼
+		//è·å–ç›®æ ‡æ–‡ä»¶å¤¹
+		File file = new File(fileString);//æ–‡ä»¶åŸç›®å½•
+		File destDir = new File(foldString);//æ–‡ä»¶å¤¹ç›®å½•
 		if(!destDir.exists()) {
             destDir.mkdir();
         }
@@ -19,7 +19,7 @@ public class WriteFloder {
 		FileInputStream fis = new FileInputStream(file);
 		String fileName = file.getName();
 		FileOutputStream fos = new FileOutputStream(new File(destDir, fileName));
-		/*µÚÎå²½£º½«ÎÄ¼şÖØĞÂĞ´ÈëÄ¿±êÎÄ¼ş¼Ğ*/
+		/*ç¬¬äº”æ­¥ï¼šå°†æ–‡ä»¶é‡æ–°å†™å…¥ç›®æ ‡æ–‡ä»¶å¤¹*/
         copy(fis, fos);
         fis.close();
         fos.close();
@@ -27,7 +27,7 @@ public class WriteFloder {
 	public static void copy(InputStream in, OutputStream out) throws Exception {
         byte[] buf = new byte[1024];
         int len = 0;
-        /*¶ÁÈ¡ÎÄ¼şÄÚÈİ²¢Ğ´ÈëÎÄ¼ş×Ö½ÚÁ÷ÖĞ*/
+        /*è¯»å–æ–‡ä»¶å†…å®¹å¹¶å†™å…¥æ–‡ä»¶å­—èŠ‚æµä¸­*/
         while((len = in.read(buf))!=-1) {
             out.write(buf, 0, len);
         }

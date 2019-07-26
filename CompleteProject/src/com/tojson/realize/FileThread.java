@@ -3,7 +3,7 @@ package com.tojson.realize;
 import org.dom4j.DocumentException;
 
 import com.tojson.realize.FileRealize;
-//Ê¹ÓÃÏß³Ì½øĞĞ×ª»»²Ù×÷µÄ¿ØÖÆ
+//ä½¿ç”¨çº¿ç¨‹è¿›è¡Œè½¬æ¢æ“ä½œçš„æ§åˆ¶
 public class FileThread implements Runnable{
 	private String sourseFile;
 	private String targetFolder;

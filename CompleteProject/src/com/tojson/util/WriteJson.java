@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 
-//Éú³ÉjsonÎÄ¼ş²¢±£´æµ½¶ÔÓ¦µÄ
+//ç”Ÿæˆjsonæ–‡ä»¶å¹¶ä¿å­˜åˆ°å¯¹åº”çš„
 public class WriteJson {
 	public void write(String string, String fileString) {
 		try {

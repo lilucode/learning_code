@@ -22,8 +22,8 @@ public class FileChooser {
 	protected Shell shell;
 	private Text sourseFile;
 	private Text targetFile;
-	public String sourceFileString;//Ô´ÎÄ¼şÂ·¾¶
-	public String targetFileString;//ÎÄ¼ş×ª»»´æ´¢Â·¾¶
+	public String sourceFileString;//æºæ–‡ä»¶è·¯å¾„
+	public String targetFileString;//æ–‡ä»¶è½¬æ¢å­˜å‚¨è·¯å¾„
 	public static void main(String[] args) {
 		try {
 			FileChooser window = new FileChooser();
@@ -44,9 +44,9 @@ public class FileChooser {
 			}
 		}
 	}
-	//´´½¨´°¿Ú
+	//åˆ›å»ºçª—å£
 	protected void createContents() {
-		//ÉèÖÃ´°¿Ú´óĞ¡ºÍÃû³Æ
+		//è®¾ç½®çª—å£å¤§å°å’Œåç§°
 		shell = new Shell();
 		shell.setSize(800, 500);
 		shell.setText("Xml2Json");
@@ -54,24 +54,24 @@ public class FileChooser {
 		Label sourceLabel = new Label(shell, SWT.NONE);
 		sourceLabel.setBounds(139, 127, 54, 20);
 		sourceLabel.setSize(80, 55);
-		sourceLabel.setText("Ä¿±êÎÄ¼ş¼Ğ£º");
+		sourceLabel.setText("ç›®æ ‡æ–‡ä»¶å¤¹ï¼š");
 
 		sourseFile = new Text(shell, SWT.BORDER);
 		sourseFile.setBounds(233, 127, 300, 20);
 		
 		Button sourseFileButton = new Button(shell, SWT.NONE);
 		sourseFileButton.setBounds(550, 127, 95, 20);
-		sourseFileButton.setText("Ñ¡È¡Ä¿±êÎÄ¼ş¼Ğ");
+		sourseFileButton.setText("é€‰å–ç›®æ ‡æ–‡ä»¶å¤¹");
 		sourseFileButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				JFileChooser jfc = new JFileChooser();
 				jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-				jfc.showDialog(new JLabel(), "Ñ¡ÔñÎÄ¼ş¼Ğ");
+				jfc.showDialog(new JLabel(), "é€‰æ‹©æ–‡ä»¶å¤¹");
 				System.out.println(jfc.getSelectedFile());
 				File file = jfc.getSelectedFile();
 				if (file == null) {
-					MessageDialog.openInformation(shell, "ÌáÊ¾", "ÇëÑ¡ÔñÄ¿±êÎÄ¼ş¼Ğ");
+					MessageDialog.openInformation(shell, "æç¤º", "è¯·é€‰æ‹©ç›®æ ‡æ–‡ä»¶å¤¹");
 				} else {
 					sourseFile.setText(file.getAbsolutePath());
 					sourceFileString = file.getAbsolutePath();
@@ -83,22 +83,22 @@ public class FileChooser {
 		Label targetLabel = new Label(shell, SWT.NONE);
 		targetLabel.setBounds(139, 181, 54, 20);
 		targetLabel.setSize(80, 55);
-		targetLabel.setText("Êä³öÎÄ¼ş¼Ğ£º");
+		targetLabel.setText("è¾“å‡ºæ–‡ä»¶å¤¹ï¼š");
 
 		targetFile = new Text(shell, SWT.BORDER);
 		targetFile.setBounds(233, 177, 300, 20);
 		Button targetFileButton = new Button(shell, SWT.NONE);
 		targetFileButton.setBounds(550, 181, 95, 20);
-		targetFileButton.setText("Ñ¡È¡Êä³öÎÄ¼ş¼Ğ");
+		targetFileButton.setText("é€‰å–è¾“å‡ºæ–‡ä»¶å¤¹");
 		targetFileButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				JFileChooser jfc = new JFileChooser();
 				jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-				jfc.showDialog(new JLabel(), "Ñ¡Ôñ");
+				jfc.showDialog(new JLabel(), "é€‰æ‹©");
 				File file = jfc.getSelectedFile();
 				if (file==null) {
-					MessageDialog.openInformation(shell, "ÌáÊ¾", "ÇëÑ¡ÔñÊä³öÎÄ¼ş¼Ğ");
+					MessageDialog.openInformation(shell, "æç¤º", "è¯·é€‰æ‹©è¾“å‡ºæ–‡ä»¶å¤¹");
 				}else {
 					targetFile.setText(file.getAbsolutePath());
 					targetFileString = file.getAbsolutePath();
@@ -109,26 +109,26 @@ public class FileChooser {
 
 		Button Begin = new Button(shell, SWT.NONE);
 		Begin.setBounds(213, 235, 72, 22);
-		Begin.setText("¿ªÊ¼×ª»»");
+		Begin.setText("å¼€å§‹è½¬æ¢");
 		Begin.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
 				String path = sourceFileString;
 				File file = new File(path);
-				//¶ÔÑ¡È¡µÄÂ·¾¶ÅĞ¶Ï£¬ÎÄ¼şºÍÎÄ¼ş¼Ğ»á½øĞĞÁ½ÖÖ²»Í¬µÄ²Ù×÷
+				//å¯¹é€‰å–çš„è·¯å¾„åˆ¤æ–­ï¼Œæ–‡ä»¶å’Œæ–‡ä»¶å¤¹ä¼šè¿›è¡Œä¸¤ç§ä¸åŒçš„æ“ä½œ
 				if (file.isDirectory()) {
-					System.out.println("×¼»»µÄÄ¿±êÊÇÎÄ¼ş¼Ğ");
+					System.out.println("å‡†æ¢çš„ç›®æ ‡æ˜¯æ–‡ä»¶å¤¹");
 					FolderThread jsonThread = new FolderThread(sourceFileString, targetFileString);
 					Thread thread = new Thread(jsonThread);
 					thread.run();
-					MessageDialog.openInformation(shell, "ÌáÊ¾", "×ª»»³É¹¦");
+					MessageDialog.openInformation(shell, "æç¤º", "è½¬æ¢æˆåŠŸ");
 				}
 				if (file.isFile()) {
-					System.out.println("×¼»»µÄÄ¿±êÊÇÎÄ¼ş");
+					System.out.println("å‡†æ¢çš„ç›®æ ‡æ˜¯æ–‡ä»¶");
 					FileThread jsonFileThread = new FileThread(sourceFileString, targetFileString);
 					Thread thread = new Thread(jsonFileThread);
 					thread.run();
-					MessageDialog.openInformation(shell, "ÌáÊ¾", "×ª»»³É¹¦");
+					MessageDialog.openInformation(shell, "æç¤º", "è½¬æ¢æˆåŠŸ");
 				}
 
 			}

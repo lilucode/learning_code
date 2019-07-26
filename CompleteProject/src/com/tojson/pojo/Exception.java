@@ -1,7 +1,11 @@
 package com.tojson.pojo;
-public class Exception {
 
+import com.alibaba.fastjson.annotation.JSONField;
+
+public class Exception {
+	@JSONField(ordinal = 1)
     private String name;
+	@JSONField(ordinal = 2)
     private String next;
     public void setName(String name) {
          this.name = name;

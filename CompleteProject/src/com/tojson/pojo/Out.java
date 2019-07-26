@@ -1,10 +1,16 @@
 
 package com.tojson.pojo;
-public class Out {
 
+import com.alibaba.fastjson.annotation.JSONField;
+
+public class Out {
+	@JSONField(ordinal = 1)
     private String caption;
+	@JSONField(ordinal = 2)
     private String name;
+	@JSONField(ordinal = 3)
     private String id;
+	@JSONField(ordinal = 4)
     private String next;
     public void setCaption(String caption) {
          this.caption = caption;

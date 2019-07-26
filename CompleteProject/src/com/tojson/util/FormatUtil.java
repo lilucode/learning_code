@@ -1,6 +1,6 @@
 package com.tojson.util;
 
-//格式化String  
+//鏍煎紡鍖朣tring  
 public class FormatUtil {
     public String formatJson(String jsonStr) {
         if (null == jsonStr || "".equals(jsonStr))
@@ -54,12 +54,12 @@ public class FormatUtil {
     }
 
     /**
-     * 添加space
+     * 娣诲姞space
      * 
      * @param sb
      * @param indent
      * @author lizhgb
-     * @Date 2015-10-14 上午10:38:04
+     * @Date 2015-10-14 涓婂崍10:38:04
      */
     private static void addIndentBlank(StringBuilder sb, int indent) {
         for (int i = 0; i < indent; i++) {

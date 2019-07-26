@@ -1,11 +1,11 @@
 package com.tojson.pojo;
 import java.util.List;
 public class InternalVars {
-    private List<Arg> arg;
-    public void setArg(List<Arg> arg) {
+    private List<InOutArg> arg;
+    public void setArg(List<InOutArg> arg) {
          this.arg = arg;
      }
-     public List<Arg> getArg() {
+     public List<InOutArg> getArg() {
          return arg;
      }
 	@Override

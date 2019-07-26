@@ -2,21 +2,38 @@ package com.tojson.pojo;
 
 import java.util.List;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 public class Lfc {
+	@JSONField(ordinal = 1)
 	private String id;
+	@JSONField(ordinal = 2)
 	private String caption;
+	@JSONField(ordinal = 3)
 	private String name;
+	@JSONField(ordinal = 4)
 	private String showId;
+	@JSONField(ordinal = 5)
 	private Geometry geometry;
-	private InArgs inArgs;
-	private OutArgs outArgs;
+	@JSONField(ordinal = 6)
 	private List<Out> out;
-	private String mappingPath;
-	private List<String> mappings;
+	@JSONField(ordinal = 7)
+	private InArgs inArgs;
+	@JSONField(ordinal = 8)
+	private OutArgs outArgs;
+	@JSONField(ordinal = 9)
 	private List<Ade> ades;
+	@JSONField(ordinal = 10)
 	private String lfcPath;
-	private FileDescription fileDescription;
+	@JSONField(ordinal = 11)
 	private Exception exception;
+	@JSONField(ordinal = 12)
+	private String mappingPath;
+	@JSONField(ordinal = 13)
+	private List<String> mappings;
+	@JSONField(ordinal = 14)
+	private FileDescription fileDescription;
+	
 	
 	public List<Ade> getAdes() {
 		return ades;

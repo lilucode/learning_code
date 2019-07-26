@@ -8,41 +8,30 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson.annotation.JSONType;
 @XmlRootElement
+@JSONType(orders = {"start","caption","geometry","fileDescription","dataBasket","inArgs","outArgs","internalVars","endstep","end","lfc","csd","component"})
 //@XmlType(propOrder = { "caption" , "start" , "geometry" , "fileDescription" , "dataBasket" , "inArgs" , "outArgs" , "internalVars" , "endstep" , "end" , "lfc" , "csd" , "component"})
 public class JsonRootBean {
-	@JSONField(ordinal = 1,name ="start")
-	private String start;
-	@JSONField(ordinal = 2)
+	private int start;
 	private String caption;
-	@JSONField(ordinal = 3)
 	private Geometry geometry;
-	@JSONField(ordinal = 4)
 	private FileDescription fileDescription;
-	@JSONField(ordinal = 5)
 	private DataBasket dataBasket;
-	@JSONField(ordinal = 6)
-	private InArgs inArgs;
-	@JSONField(ordinal = 7)
-	private OutArgs outArgs;
-	@JSONField(ordinal = 8)
+	private InArgs2 inArgs;
+	private OutArgs2 outArgs;
 	private InternalVars internalVars;
-	@JSONField(ordinal = 9)
 	private Endstep endstep;
-	@JSONField(ordinal = 10)
 	private List<End> end;
-	@JSONField(ordinal = 11)
 	private List<Component> component;
-	@JSONField(ordinal = 12)
 	private List<Csd> csd;
-	@JSONField(ordinal = 13)
 	private List<Lfc> lfc;
-	@JSONField(ordinal = 14)
 	@XmlElement(name = "start")
-	public String getStart() {
+	
+	public int getStart() {
 		return start;
 	}
-	public void setStart(String start) {
+	public void setStart(int start) {
 		this.start = start;
 	}
 	@XmlElement(name = "caption")
@@ -75,17 +64,17 @@ public class JsonRootBean {
 		this.dataBasket = dataBasket;
 	}
 	@XmlElement(name = "inArgs")
-	public InArgs getInArgs() {
+	public InArgs2 getInArgs() {
 		return inArgs;
 	}
-	public void setInArgs(InArgs inArgs) {
+	public void setInArgs(InArgs2 inArgs) {
 		this.inArgs = inArgs;
 	}
 	@XmlElement(name = "outArgs")
-	public OutArgs getOutArgs() {
+	public OutArgs2 getOutArgs() {
 		return outArgs;
 	}
-	public void setOutArgs(OutArgs outArgs) {
+	public void setOutArgs(OutArgs2 outArgs) {
 		this.outArgs = outArgs;
 	}
 	@XmlElement(name = "internalVars")

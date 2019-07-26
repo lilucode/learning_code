@@ -1,14 +1,25 @@
 package com.tojson.pojo;
-public class Arg {
 
+import com.alibaba.fastjson.annotation.JSONField;
+
+public class Arg {
+	@JSONField(ordinal = 1)
     private String name;
+	@JSONField(ordinal = 2)
     private String caption;
+	@JSONField(ordinal = 3)
     private String description;
+	@JSONField(ordinal = 4)
     private String example;
+	@JSONField(ordinal = 5)
     private String editor;
+	@JSONField(ordinal = 6)
     private String type;
+	@JSONField(ordinal = 7)
     private String value;
+	@JSONField(ordinal = 8)
     private String required;
+	@JSONField(ordinal = 9)
     private String contains;
     public void setName(String name) {
          this.name = name;

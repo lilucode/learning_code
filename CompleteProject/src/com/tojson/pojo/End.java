@@ -1,8 +1,13 @@
 package com.tojson.pojo;
-public class End {
 
+import com.alibaba.fastjson.annotation.JSONField;
+
+public class End {
+	@JSONField(ordinal = 1)
     private String caption;
+	@JSONField(ordinal = 2)
     private String name;
+	@JSONField(ordinal = 3)
     private String id;
     public void setCaption(String caption) {
          this.caption = caption;

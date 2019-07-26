@@ -5,19 +5,20 @@ import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-//»ñÈ¡ÎÄ¼ş¼ĞÖĞËùÓĞµÄ.xmlÎÄ¼ş
+//è·å–æ–‡ä»¶å¤¹ä¸­æ‰€æœ‰çš„.xmlæ–‡ä»¶
 public class GetFile {
-	//ÎÄ¼şÏÂËùÓĞÎÄ¼şµÄ
+	//æ–‡ä»¶ä¸‹æ‰€æœ‰æ–‡ä»¶çš„
 	public String[] getFilStrings(File file) {
 		ArrayList<String> listFileName = new ArrayList<String>();
 		getAllFileName(file.toString(),listFileName);
 		StringBuilder sBuilder = new StringBuilder();
 		for (String fileString : listFileName) {
-			if (fileString.contains(".xml")||fileString.contains(".lfc")) {
+			if (fileString.contains(".xml")||fileString.contains(".bcpt")) {
 				sBuilder.append(fileString+",");
 			}
 		}
 		String[] arr=new String(sBuilder).split(",");
+		
 		return arr;
 	}
 	public static void getAllFileName(String path, ArrayList<String> listFileName) {
@@ -32,7 +33,7 @@ public class GetFile {
 			listFileName.addAll(Arrays.asList(completNames));
 		}
 		for (File a : files) {
-			 if(a.isDirectory()){//Èç¹ûÎÄ¼ş¼ĞÏÂÓĞ×ÓÎÄ¼ş¼Ğ£¬»ñÈ¡×ÓÎÄ¼ş¼ĞÏÂµÄËùÓĞÎÄ¼şÈ«Â·¾¶¡£
+			 if(a.isDirectory()){//å¦‚æœæ–‡ä»¶å¤¹ä¸‹æœ‰å­æ–‡ä»¶å¤¹ï¼Œè·å–å­æ–‡ä»¶å¤¹ä¸‹çš„æ‰€æœ‰æ–‡ä»¶å…¨è·¯å¾„ã€‚
 	                getAllFileName(a.getAbsolutePath(),listFileName);
 	            }
 		}

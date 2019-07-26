@@ -4,16 +4,16 @@ import org.dom4j.DocumentException;
 import com.tojson.getXml.GetBean;
 import com.tojson.util.GetXmlUtil;
 import com.tojson.util.WriteJson;
-//xml¸ñÊ½×ªjson¸ñÊ½
+//xmlæ ¼å¼è½¬jsonæ ¼å¼
 public class FileRealize {
 	public void XmlToJson(String fileName, String targetFolder) throws DocumentException {
 		try {
 			GetXmlUtil getXml = new GetXmlUtil();
-			//»ñÈ¡ÎÄ¼şµÄÃû³Æ
+			//è·å–æ–‡ä»¶çš„åç§°
 			String jsonName = getXml.getName(fileName);
-			//»ñÈ¡¸ñÊ½»¯Ö®ºóµÄjsonÎÄ¼ş
+			//è·å–æ ¼å¼åŒ–ä¹‹åçš„jsonæ–‡ä»¶
 			String formateString = GetBean.Bean(fileName);
-			//½«jsonÎÄ¼şĞ´ÈëÎÄ¼şÖĞ±£´æµ½Ä¿±êÎÄ¼ş¼ĞÖĞ
+			//å°†jsonæ–‡ä»¶å†™å…¥æ–‡ä»¶ä¸­ä¿å­˜åˆ°ç›®æ ‡æ–‡ä»¶å¤¹ä¸­
 			WriteJson setJson = new WriteJson();
 			setJson.write(formateString, targetFolder + "//" + jsonName);
 		} catch (Exception e) {

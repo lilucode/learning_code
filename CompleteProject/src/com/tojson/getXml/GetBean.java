@@ -23,19 +23,19 @@ import com.tojson.pojo.OutArgs;
 import com.tojson.util.FormatUtil;
 
 import jdk.nashorn.internal.parser.JSONParser;
-//½«javaBean×ª»»Îªjson
+//å°†javaBeanè½¬æ¢ä¸ºjson
 public class GetBean {
 	public static String Bean(String fileString) throws DocumentException {
 		GetXml getXml = new GetXml();
-		//µ÷ÓÃ¸ñÊ½»¯¹¤¾ßÀà£¬½«JavaBean¶ÔÏó×ªÎªJSONStringºó¶ÔString¸ñÊ½µÄjsonÊı¾İ½øĞĞ¸ñÊ½»¯
+		//è°ƒç”¨æ ¼å¼åŒ–å·¥å…·ç±»ï¼Œå°†JavaBeanå¯¹è±¡è½¬ä¸ºJSONStringåå¯¹Stringæ ¼å¼çš„jsonæ•°æ®è¿›è¡Œæ ¼å¼åŒ–
 		FormatUtil formatUtil = new FormatUtil();
-		//Ê¹ÓÃToJsonString½«javaBean×ª»»Îªjson¸ñÊ½µÄString×Ö·û´®
-		return formatUtil.formatJson(JSON.toJSONString(getXml.getXml(fileString)));
-	}
-	public static void main(String[] args) throws DocumentException {
-		GetXml getXml = new GetXml();
-		FormatUtil formatUtil = new FormatUtil();
-		JsonRootBean jsonRootBean2 = getXml.getXml("token.xml");
-		System.out.println(formatUtil.formatJson(JSON.toJSONString(jsonRootBean2)));
+		//ä½¿ç”¨ToJsonStringå°†javaBeanè½¬æ¢ä¸ºjsonæ ¼å¼çš„Stringå­—ç¬¦ä¸²
+		String string = JSON.toJSONString(getXml.getXml(fileString));
+		String string2 = string.replace("[\r\n" + 
+				"			{\r\n" + 
+				"				\r\n" + 
+				"			}\r\n" + 
+				"		]", "[]");
+		return formatUtil.formatJson(string2);
 	}
 }

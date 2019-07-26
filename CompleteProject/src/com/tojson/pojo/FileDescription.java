@@ -1,9 +1,13 @@
 package com.tojson.pojo;
 
-public class FileDescription {
+import com.alibaba.fastjson.annotation.JSONField;
 
+public class FileDescription {
+	@JSONField(ordinal = 1)
     private String author;
+	@JSONField(ordinal = 2)
     private String function;
+	@JSONField(ordinal = 3)
     private String remark;
     public void setAuthor(String author) {
          this.author = author;

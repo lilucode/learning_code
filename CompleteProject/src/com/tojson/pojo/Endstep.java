@@ -1,9 +1,13 @@
 package com.tojson.pojo;
 import java.util.List;
-public class Endstep {
 
+import com.alibaba.fastjson.annotation.JSONField;
+public class Endstep {
+	@JSONField(ordinal = 1)
     private String id;
+	@JSONField(ordinal = 2)
     private Geometry geometry;
+	@JSONField(ordinal = 3)
     private List<In> in;
     public void setId(String id) {
          this.id = id;

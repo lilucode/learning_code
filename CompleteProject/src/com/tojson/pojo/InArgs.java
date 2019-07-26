@@ -3,17 +3,13 @@ import java.util.List;
 
 import com.alibaba.fastjson.annotation.JSONField;
 public class InArgs {
-    private List<Arg> inarg;
-	public List<Arg> getArg() {
-		return inarg;
+	@JSONField(name = "arg")
+	private List<Arg> args;
+	public List<Arg> getArgs() {
+		return args;
 	}
-	public void setArg(List<Arg> arg) {
-		this.inarg = arg;
-	}
-	@Override
-	public String toString() {
-		return "InArgs [inarg=" + inarg + "]";
+	public void setArgs(List<Arg> args) {
+		this.args = args;
 	}
 	
-
 }

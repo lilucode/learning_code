@@ -28,7 +28,7 @@ public class FolderRealize {
 			
 			WriteJson setJson = new WriteJson();
 			setJson.write(formateString, targetFolder+finalFile);
-			System.out.println(jsonName+"转换成功");
+			System.out.println(jsonName+"杞崲鎴愬姛");
 			
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -37,7 +37,7 @@ public class FolderRealize {
 			String[] files = getFile.getFilStrings(file);
 			GetXmlUtil getXml = new GetXmlUtil();
 			String jsonName = getXml.getName(files[i]);
-			System.out.println(jsonName+"转换失败");
+			System.out.println(jsonName+"杞崲澶辫触");
 			e.printStackTrace();
 		}
 		

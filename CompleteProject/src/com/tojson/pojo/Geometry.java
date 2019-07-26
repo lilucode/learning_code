@@ -1,7 +1,6 @@
 package com.tojson.pojo;
 
 import com.alibaba.fastjson.annotation.JSONField;
-
 public class Geometry {
 	@JSONField(ordinal = 1)
     private int x;

@@ -11,24 +11,24 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
-//»ñÈ¡xmlÎÄ¼ş½«Æä×ª»»ÎªString
+//è·å–xmlæ–‡ä»¶å°†å…¶è½¬æ¢ä¸ºString
 public class GetXmlUtil {
-	//»ñÈ¡xmlÎÄ¼şµÄÃû×Ö²¢ĞŞ¸ÄÎª.jsonÎÄ¼ş
+	//è·å–xmlæ–‡ä»¶çš„åå­—å¹¶ä¿®æ”¹ä¸º.jsonæ–‡ä»¶
 	public String getName(String string) {
 		File file = new File(string.trim());
 		if (file.getName().contains(".xml")) {
 			return file.getName().replace(".xml", ".json");
-		}else if (file.getName().contains(".lfc")) {
-			return file.getName().replace(".lfc", ".json");
+		}else if (file.getName().contains(".bcpt")) {
+			return file.getName().replace(".bcpt", ".json");
 		}else {
 			return null;
 		}
 	}
 	
-	//½«xmlÎÄ¼şÏÈ×ª»»ÎªStringµÄĞÎÊ½
+	//å°†xmlæ–‡ä»¶å…ˆè½¬æ¢ä¸ºStringçš„å½¢å¼
 	public String turnDocumentToString(String string) {
 		try {
-			// ¶ÁÈ¡ xml ÎÄ¼ş
+			// è¯»å– xml æ–‡ä»¶
 			File fileinput = new File(string);
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();

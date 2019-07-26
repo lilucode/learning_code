@@ -26,33 +26,37 @@ import com.tojson.pojo.FileDescription;
 import com.tojson.pojo.Geometry;
 import com.tojson.pojo.In;
 import com.tojson.pojo.InArgs;
+import com.tojson.pojo.InArgs2;
+import com.tojson.pojo.InOutArg;
 import com.tojson.pojo.InternalVars;
 import com.tojson.pojo.JsonRootBean;
 import com.tojson.pojo.Lfc;
 import com.tojson.pojo.Out;
 import com.tojson.pojo.OutArgs;
+import com.tojson.pojo.OutArgs2;
 import com.tojson.util.FormatUtil;
+import com.tojson.util.UpperCase;
 
-//��xml�л�ȡ���ݴ���javaBean
+//从xml中获取数据存入javaBean
 public class GetXml {
 	public JsonRootBean getXml(String fileString) throws DocumentException {
 		JsonRootBean jsonRootBean = new JsonRootBean();
-		// ��ȡ����JsonRootBean�е�id����ֵ
+		// 获取设置JsonRootBean中的id属性值
 		SAXReader saxread = new SAXReader();
 		File xmlFile = new File(fileString);
 		if (xmlFile.exists()) {
-			Document document = saxread.read(xmlFile);// ��ȡXML�ļ�
+			Document document = saxread.read(xmlFile);// 读取XML文件
 			List<Element> nodeElements = document.selectNodes("//Component/Implementation/Node");
 			for (int i = 0; i < nodeElements.size(); i++) {
 				Element node = nodeElements.get(i);
 				Element name = (Element) node.selectSingleNode("Name");
-				if (name.getTextTrim().equals("��ʼ")) {
+				if (name.getTextTrim().equals("开始")) {
 					Element sourceConnections = (Element) node.selectSingleNode("SourceConnections/Connection");
 					Iterator<Element> sourceConnectionsIterator = sourceConnections.elementIterator();
 					while (sourceConnectionsIterator.hasNext()) {
 						Element temporary = sourceConnectionsIterator.next();
 						if (temporary.getName().equals("targetId")) {
-							jsonRootBean.setStart(temporary.getTextTrim());
+							jsonRootBean.setStart(Integer.valueOf(temporary.getTextTrim()));
 						}
 
 					}
@@ -60,17 +64,17 @@ public class GetXml {
 
 			}
 		}
-		// ��ȡ����JsonRootBean�е�caption����ֵ
+		// 获取设置JsonRootBean中的caption属性值
 		jsonRootBean.setCaption("");
-		// ��ȡ����JsonRootBean�е�geometry����ֵ
+		// 获取设置JsonRootBean中的geometry属性值
 		Geometry geometry = new Geometry();
 		if (xmlFile.exists()) {
-			Document document = saxread.read(xmlFile);// ��ȡXML�ļ�
+			Document document = saxread.read(xmlFile);// 读取XML文件
 			List<Element> nodeElements = document.selectNodes("//Component/Implementation/Node");
 			for (int i = 0; i < nodeElements.size(); i++) {
 				Element node = nodeElements.get(i);
-				Element name = (Element) node.selectSingleNode("Name"); // ���houseMonitor�ڵ��µ�idֵ
-				if (name.getTextTrim().equals("��ʼ")) {
+				Element name = (Element) node.selectSingleNode("Name"); // 获得houseMonitor节点下的id值
+				if (name.getTextTrim().equals("开始")) {
 					Element Constraint = (Element) node.selectSingleNode("Constraint");
 					Iterator<Element> ConstraintIterator = Constraint.elementIterator();
 					while (ConstraintIterator.hasNext()) {
@@ -86,15 +90,16 @@ public class GetXml {
 							geometry.setWidth(Integer.valueOf(strings[0]));
 							geometry.setHeight(Integer.valueOf(strings[1]));
 						}
+						//System.out.println(geometry);
 					}
 				}
 			}
 		}
 		jsonRootBean.setGeometry(geometry);
-		// ��ȡ����JsonRootBean�е�fileDescription����ֵ
+		// 获取设置JsonRootBean中的fileDescription属性值
 		FileDescription fileDescription = new FileDescription();
 		if (xmlFile.exists()) {
-			Document document = saxread.read(xmlFile);// ��ȡXML�ļ�
+			Document document = saxread.read(xmlFile);// 读取XML文件
 			List<Element> nodeElements = document.selectNodes("//Component");
 			for (int i = 0; i < nodeElements.size(); i++) {
 				Element node = nodeElements.get(i);
@@ -107,54 +112,56 @@ public class GetXml {
 			}
 		}
 		jsonRootBean.setFileDescription(fileDescription);
-		// ��ȡ����JsonRootBean�е�dataBasket����ֵ
+		// 获取设置JsonRootBean中的dataBasket属性值
 		DataBasket dataBasket = new DataBasket();
 		List<Ade> ades = new ArrayList<Ade>();
-		for (int i = 0; i < 1; i++) {
-			Ade ade = new Ade();
-			ades.add(ade);
-		}
+		
 		dataBasket.setAde(ades);
 		jsonRootBean.setDataBasket(dataBasket);
-		// ��ȡ����JsonRootBean�е�inArgs����ֵ
-		InArgs inArgs = new InArgs();
+		// 获取设置JsonRootBean中的inArgs属性值
+		InArgs2 inArgs = new InArgs2();
 		if (xmlFile.exists()) {
-			Document document = saxread.read(xmlFile);// ��ȡXML�ļ�
+			Document document = saxread.read(xmlFile);// 读取XML文件
 			List<Element> nodeElements = document.selectNodes("//Component/InArgs/Arg");
-			List<Arg> args = new ArrayList<Arg>();
-			for (int i = 0; i < nodeElements.size(); i++) {
-				Element node = nodeElements.get(i);
-				Arg arg = new Arg();
-				Element name = (Element) node.selectSingleNode("Key");
-				Element type = (Element) node.selectSingleNode("DefValue");
-				Element description = (Element) node.selectSingleNode("Desp");
-				arg.setName(name.getTextTrim());
-				arg.setType(type.getTextTrim());
-				arg.setDescription(description.getTextTrim());
-				arg.setExample("");
-				arg.setValue("");
-				args.add(arg);
-			}
-			inArgs.setArg(args);
-		}
-		jsonRootBean.setInArgs(inArgs);
-		// ��ȡ����JsonRootBean�е�ouArgs����ֵ
-		OutArgs outArgs = new OutArgs();
-		if (xmlFile.exists()) {
-			Document document = saxread.read(xmlFile);// ��ȡXML�ļ�
-			List<Element> nodeElements = document.selectNodes("//Component/OutArgs/Arg");
-			List<Arg> args = new ArrayList<Arg>();
+			List<InOutArg> args = new ArrayList<InOutArg>();
 			for (int i = 0; i < nodeElements.size(); i++) {
 				if (nodeElements.size() == 0) {
-					Arg arg = new Arg();
+					InOutArg arg = new InOutArg();
 					args.add(arg);
 				} else {
-					Arg arg = new Arg();
+					Element node = nodeElements.get(i);
+					InOutArg arg = new InOutArg();
+					Element name = (Element) node.selectSingleNode("Key");
+					Element example = (Element) node.selectSingleNode("DefValue");
+					Element description = (Element) node.selectSingleNode("Desp");
+					arg.setName(name.getTextTrim());
+					arg.setType("");
+					arg.setDescription(description.getTextTrim());
+					arg.setExample(example.getTextTrim());
+					arg.setValue("");
+					args.add(arg);
+				}
+			}
+			inArgs.setInOutArgs(args);
+		}
+		jsonRootBean.setInArgs(inArgs);
+		// 获取设置JsonRootBean中的ouArgs属性值
+		OutArgs2 outArgs = new OutArgs2();
+		if (xmlFile.exists()) {
+			Document document = saxread.read(xmlFile);// 读取XML文件
+			List<Element> nodeElements = document.selectNodes("//Component/OutArgs/Arg");
+			List<InOutArg> args = new ArrayList<InOutArg>();
+			for (int i = 0; i < nodeElements.size(); i++) {
+				if (nodeElements.size() == 0) {
+					InOutArg arg = new InOutArg();
+					args.add(arg);
+				} else {
+					InOutArg arg = new InOutArg();
 					Element node = nodeElements.get(i);
 					Element name = (Element) node.selectSingleNode("Key");
 					Element type = (Element) node.selectSingleNode("DefValue");
 					Element description = (Element) node.selectSingleNode("Desp");
-					// ���Ŀ���в����ڸñ�ǩ��Ĭ������Ϊ��
+					// 如果目标中不存在该标签，默认设置为空
 					if (name == null) {
 						arg.setName("");
 					} else {
@@ -175,27 +182,25 @@ public class GetXml {
 					args.add(arg);
 				}
 			}
-			outArgs.setArg(args);
+			outArgs.setInOutArgs(args);
 		}
 		jsonRootBean.setOutArgs(outArgs);
-		// ��ȡ����JsonRootBean�е�internalVars����ֵ
+		// 获取设置JsonRootBean中的internalVars属性值
 		InternalVars internalVars = new InternalVars();
-		List<Arg> args = new ArrayList<Arg>();
-		Arg arg = new Arg();
-		args.add(arg);
+		List<InOutArg> args = new ArrayList<InOutArg>();
 		internalVars.setArg(args);
 		jsonRootBean.setInternalVars(internalVars);
-		// ��ȡ����JsonRootBean�е�endstep����ֵ
+		// 获取设置JsonRootBean中的endstep属性值
 		Endstep endstep = new Endstep();
 		Geometry geometryEndstep = new Geometry();
-		// ��ȡgeometryEndstep
+		// 获取geometryEndstep
 		if (xmlFile.exists()) {
-			Document document = saxread.read(xmlFile);// ��ȡXML�ļ�
+			Document document = saxread.read(xmlFile);// 读取XML文件
 			List<Element> nodeElements = document.selectNodes("//Component/Implementation/Node");
 			for (int i = 0; i < nodeElements.size(); i++) {
 				Element node = nodeElements.get(i);
-				Element name = (Element) node.selectSingleNode("Name"); // ���houseMonitor�ڵ��µ�idֵ
-				if (name.getTextTrim().equals("��������")) {
+				Element name = (Element) node.selectSingleNode("Name"); // 获得houseMonitor节点下的id值
+				if (name.getTextTrim().equals("正常结束")) {
 					Element Constraint = (Element) node.selectSingleNode("Constraint");
 					Iterator<Element> ConstraintIterator = Constraint.elementIterator();
 					while (ConstraintIterator.hasNext()) {
@@ -215,72 +220,85 @@ public class GetXml {
 				}
 			}
 		}
-		// ��ȡIn
+		// 获取In
 		List<In> ins = new ArrayList<In>();
 		In in = new In();
 		in.setId("1");
-		in.setCaption("��������");
-		in.setName("��������");
+		in.setCaption("正常出口");
+		in.setName("正常出口");
 		ins.add(in);
 		endstep.setId("1000");
 		endstep.setGeometry(geometryEndstep);
 		endstep.setIn(ins);
 		jsonRootBean.setEndstep(endstep);
-		// ��ȡ����JsonRootBean�е�end����ֵ
+		// 获取设置JsonRootBean中的end属性值
 		List<End> ends = new ArrayList<End>();
 		if (xmlFile.exists()) {
-			Document document = saxread.read(xmlFile);// ��ȡXML�ļ�
+			Document document = saxread.read(xmlFile);// 读取XML文件
 			List<Element> nodeElements = document.selectNodes("//Component/Implementation/Node");
 			End end = new End();
 			for (int i = 0; i < nodeElements.size(); i++) {
 				Element node = nodeElements.get(i);
 				Element name = (Element) node.selectSingleNode("Name");
-				if (name.getTextTrim().equals("��������")) {
+				if (name.getTextTrim().equals("正常结束")) {
 					Element id = (Element) node.selectSingleNode("Id");
 					end.setId(id.getTextTrim());
-					end.setCaption("��������");
-					end.setName("��������");
+					end.setCaption("正常出口");
+					end.setName("正常出口");
 				}
 			}
 			ends.add(end);
 		}
 		jsonRootBean.setEnd(ends);
-		// ��ȡ����JsonRootBean�е�component����ֵ
+		// 获取设置JsonRootBean中的component属性值
 		List<Component> components = new ArrayList<Component>();
-		// ��ȡcomponent
+		// 获取component
 		if (xmlFile.exists()) {
-			Document document = saxread.read(xmlFile);// ��ȡXML�ļ�
+			Document document = saxread.read(xmlFile);// 读取XML文件
 			List<Element> nodeElements = document.selectNodes("//Component/Implementation/Node");
 			for (int i = 0; i < nodeElements.size(); i++) {
 				Element node = nodeElements.get(i);
-				Element id = (Element) node.selectSingleNode("Id");
-				Element caption = (Element) node.selectSingleNode("Name");
-				Element name = (Element) node.selectSingleNode("Target");
-				if (!(caption.getTextTrim().equals("��ʼ")) && !caption.getTextTrim().equals("��������")) {
-					Component component = new Component();
-					component.setId(id.getTextTrim());
-					component.setCaption(caption.getTextTrim());
-					component.setName(name.getTextTrim());
-					component.setShowId(id.getTextTrim());
-					// ��ȡgeomery
-					Element Constraint = (Element) node.selectSingleNode("Constraint");
-					Iterator<Element> ConstraintIterator = Constraint.elementIterator();
-					while (ConstraintIterator.hasNext()) {
-						Geometry geometryCompoent = new Geometry();
-						Element temporary = ConstraintIterator.next();
-						if (temporary.getName().equals("Location")) {
-							String locationString = temporary.getTextTrim();
-							String[] strings = locationString.split(",");
-							geometryCompoent.setX(Integer.valueOf(strings[0]));
-							geometryCompoent.setY(Integer.valueOf(strings[1]));
-						} else if (temporary.getName().equals("Size")) {
-							String sizeString = temporary.getTextTrim();
-							String[] strings = sizeString.split(",");
-							geometryCompoent.setWidth(Integer.valueOf(strings[0]));
-							geometryCompoent.setHeight(Integer.valueOf(strings[1]));
+				Element type = (Element) node.selectSingleNode("Type");
+				if (type.getTextTrim().equals("11")) {
+					Element id = (Element) node.selectSingleNode("Id");
+					Element caption = (Element) node.selectSingleNode("Name");
+					Element name = (Element) node.selectSingleNode("Target");
+					String stringName = name.getTextTrim();
+					//System.out.println(stringName);
+					String[] string = stringName.split("\\.");
+					int length = string.length;
+					String NameString = string[length-1];
+					String realNameString = UpperCase.upperCase(NameString)+"Logiclet";
+					//System.out.println("-----------");
+					if (!(caption.getTextTrim().equals("开始")) && !caption.getTextTrim().equals("正常结束")) {
+						Component component = new Component();
+						component.setId(id.getTextTrim());
+						component.setCaption(caption.getTextTrim());
+						component.setName(realNameString);
+						component.setShowId(id.getTextTrim());
+						// 获取geomery
+						Element Constraint = (Element) node.selectSingleNode("Constraint");
+						Iterator<Element> ConstraintIterator = Constraint.elementIterator();
+						Geometry geometryc = new Geometry();
+						while (ConstraintIterator.hasNext()) {
+
+							Element temporary = ConstraintIterator.next();
+							if (temporary.getName().equals("Location")) {
+								String locationString = temporary.getTextTrim();
+								String[] strings = locationString.split(",");
+								geometryc.setX((Integer.valueOf(strings[0])));
+								// System.out.println(Integer.valueOf(string[0]));
+								geometryc.setY(Integer.valueOf(strings[1]));
+							} else if (temporary.getName().equals("Size")) {
+								String sizeString = temporary.getTextTrim();
+								String[] strings = sizeString.split(",");
+								geometryc.setWidth(Integer.valueOf(strings[0]));
+								geometryc.setHeight(Integer.valueOf(strings[1]));
+							}
+
 						}
-						component.setGeometry(geometryCompoent);
-						// ��ȡInArgs
+						component.setGeometry(geometryc);
+						// 获取InArgs
 						InArgs inArgsComponent = new InArgs();
 						List<Element> inArgsrgElements = node.selectNodes("InArgs/Arg");
 						List<Arg> inargsComponent = new ArrayList<Arg>();
@@ -289,7 +307,7 @@ public class GetXml {
 							Element inArgNode = inArgsrgElements.get(j);
 							Element inArgName = (Element) inArgNode.selectSingleNode("Key");
 							Element inArgCaption = (Element) inArgNode.selectSingleNode("Name");
-							Element inArgDescription = (Element) inArgNode.selectSingleNode("Type");
+							Element inArgEditor = (Element) inArgNode.selectSingleNode("Type");
 							Element inArgValue = (Element) inArgNode.selectSingleNode("Arg");
 							if (inArgName == null) {
 								argComponent.setName("");
@@ -301,10 +319,10 @@ public class GetXml {
 							} else {
 								argComponent.setCaption(inArgCaption.getTextTrim());
 							}
-							if (inArgDescription == null) {
+							if (inArgEditor == null) {
 								argComponent.setDescription("");
 							} else {
-								argComponent.setDescription(inArgDescription.getTextTrim());
+								argComponent.setDescription(inArgEditor.getTextTrim());
 							}
 							if (inArgValue == null) {
 								argComponent.setValue("");
@@ -312,16 +330,16 @@ public class GetXml {
 								argComponent.setValue(inArgValue.getTextTrim());
 							}
 							argComponent.setContains("");
-							argComponent.setEditor("");
+							argComponent.setDescription("");
 							argComponent.setExample("");
 							argComponent.setRequired("");
 							argComponent.setType("");
 							inargsComponent.add(argComponent);
 						}
-						inArgsComponent.setArg(inargsComponent);
+						inArgsComponent.setArgs(inargsComponent);
 						component.setInArgs(inArgsComponent);
 
-						// ��ȡOutArgs
+						// 获取OutArgs
 						OutArgs outArgsComponent = new OutArgs();
 						List<Element> outArgElements = node.selectNodes("OutArgs/Arg");
 						List<Arg> ouArgsComponent = new ArrayList<Arg>();
@@ -359,9 +377,10 @@ public class GetXml {
 							argComponent.setType("");
 							ouArgsComponent.add(argComponent);
 						}
+						outArgsComponent.setArgs(ouArgsComponent);
 						component.setOutArgs(outArgsComponent);
 
-						// ��ȡOut
+						// 获取Out
 						List<Out> outList = new ArrayList<Out>();
 						List<Element> outElements = node.selectNodes("Terminals/Terminal");
 						for (int j = 0; j < outElements.size(); j++) {
@@ -369,10 +388,10 @@ public class GetXml {
 							Element outNode = outElements.get(j);
 							Element outCaption = (Element) outNode.selectSingleNode("Desp");
 							Element outName = (Element) outNode.selectSingleNode("Name");
-							if (!outCaption.getTextTrim().equals("ʧ��")) {
+							if (!outCaption.getTextTrim().equals("失败")) {
 								Out out = new Out();
-								// �ж�next�������
-								String nextString = null;
+								// 判断next所需代码
+								
 								List<Element> Connections = node.selectNodes("SourceConnections/Connection");
 								for (int x = 0; x < Connections.size(); x++) {
 									Element ConnectionNode = Connections.get(x);
@@ -381,26 +400,32 @@ public class GetXml {
 									String sourceTerminalString = SourceTerminal.getTextTrim();
 									if (sourceTerminalString.equals(outName.getTextTrim())) {
 										Element targetId = (Element) ConnectionNode.selectSingleNode("targetId");
-										nextString = targetId.getTextTrim();
+										String nextString = targetId.getTextTrim();
+										if (nextString.equals("2")) {
+											out.setNext("1001");
+										}else {
+											out.setNext(nextString);
+										}
 									}
 								}
 								out.setCaption(outCaption.getTextTrim());
 								out.setName(outName.getTextTrim());
-								out.setId(caption.getTextTrim());
-								out.setNext(nextString);
+								out.setId("");
+								
+								
 								outList.add(out);
 							}
 						}
 						component.setOut(outList);
-						// ��ȡexception
+						// 获取exception
 						Exception exception = new Exception();
 						List<Element> exceptionElements = node.selectNodes("Terminals/Terminal");
 						for (int j = 0; j < exceptionElements.size(); j++) {
 							Element exceptionNode = exceptionElements.get(j);
 							Element exceptionCaption = (Element) exceptionNode.selectSingleNode("Desp");
 							Element exceptionName = (Element) exceptionNode.selectSingleNode("Name");
-							if (exceptionCaption.getTextTrim().equals("ʧ��")) {
-								// �ж�next�������
+							if (exceptionCaption.getTextTrim().equals("失败")) {
+								// 判断next所需代码
 								String nextString = null;
 								List<Element> Connections = node.selectNodes("SourceConnections/Connection");
 								for (int x = 0; x < Connections.size(); x++) {
@@ -413,37 +438,44 @@ public class GetXml {
 										nextString = targetId.getTextTrim();
 									}
 								}
-								exception.setName(exceptionName.getTextTrim());
-								exception.setNext(nextString);
+								exception.setName("");
+								if (nextString==null) {
+									exception.setNext("");
+								}else {
+									exception.setNext(nextString);
+								}
+								
 							}
 							component.setException(exception);
 						}
+
+						components.add(component);
 					}
-					components.add(component);
 				}
+
 			}
 		}
 		jsonRootBean.setComponent(components);
-		// ��ȡ����JsonRootBean�е�lfc����ֵ
+		// 获取设置JsonRootBean中的lfc属性值
 		List<Lfc> lfcs = new ArrayList<Lfc>();
-		// ��ȡLfc
+		// 获取Lfc
 		if (xmlFile.exists()) {
-			Document document = saxread.read(xmlFile);// ��ȡXML�ļ�
+			Document document = saxread.read(xmlFile);// 读取XML文件
 			List<Element> nodeElements = document.selectNodes("//Component/Implementation/Node");
 			for (int i = 0; i < nodeElements.size(); i++) {
 				Element node = nodeElements.get(i);
 				Element id = (Element) node.selectSingleNode("Id");
-				Element caption = (Element) node.selectSingleNode("Name");
+				Element caption = (Element) node.selectSingleNode("Desp");
 				Element name = (Element) node.selectSingleNode("Target");
 				Element type = (Element) node.selectSingleNode("Type");
-				if (!(caption.getTextTrim().equals("��ʼ")) && !caption.getTextTrim().equals("��������")) {
+				if (!(caption.getTextTrim().equals("开始")) && !caption.getTextTrim().equals("正常结束")) {
 					if (type.getTextTrim().equals("7") || type.getTextTrim().equals("12")) {
 						Lfc lfc = new Lfc();
 						lfc.setId(id.getTextTrim());
 						lfc.setCaption(caption.getTextTrim());
 						lfc.setName(name.getTextTrim());
 						lfc.setShowId(id.getTextTrim());
-						// ��ȡgeomery
+						// 获取geomery
 						Element Constraint = (Element) node.selectSingleNode("Constraint");
 						Iterator<Element> ConstraintIterator = Constraint.elementIterator();
 						while (ConstraintIterator.hasNext()) {
@@ -461,7 +493,7 @@ public class GetXml {
 								geometryLfc.setHeight(Integer.valueOf(strings[1]));
 							}
 							lfc.setGeometry(geometryLfc);
-							// ��ȡInArgs
+							// 获取InArgs
 							InArgs inArgsLfc = new InArgs();
 							List<Element> inArgsrgElements = node.selectNodes("InArgs/Arg");
 							List<Arg> inargsLfc = new ArrayList<Arg>();
@@ -491,10 +523,10 @@ public class GetXml {
 								argLfc.setType("");
 								inargsLfc.add(argLfc);
 							}
-							inArgsLfc.setArg(inargsLfc);
+							inArgsLfc.setArgs(inargsLfc);
 							lfc.setInArgs(inArgsLfc);
 
-							// ��ȡOutArgs
+							// 获取OutArgs
 							OutArgs outArgsLfc = new OutArgs();
 							List<Element> outArgElements = node.selectNodes("OutArgs/Arg");
 							List<Arg> ouArgsLfc = new ArrayList<Arg>();
@@ -526,16 +558,16 @@ public class GetXml {
 							}
 							lfc.setOutArgs(outArgsLfc);
 
-							// ��ȡOut
+							// 获取Out
 							List<Out> outList = new ArrayList<Out>();
 							List<Element> outElements = node.selectNodes("Terminals/Terminal");
 							for (int j = 0; j < outElements.size(); j++) {
 								Element outNode = outElements.get(j);
 								Element outCaption = (Element) outNode.selectSingleNode("Desp");
 								Element outName = (Element) outNode.selectSingleNode("Name");
-								if (!outCaption.getTextTrim().equals("ʧ��")) {
+								if (!outCaption.getTextTrim().equals("失败")) {
 									Out out = new Out();
-									// �ж�next�������
+									// 判断next所需代码
 									String nextString = null;
 									List<Element> Connections = node.selectNodes("SourceConnections/Connection");
 									for (int x = 0; x < Connections.size(); x++) {
@@ -556,15 +588,15 @@ public class GetXml {
 								}
 							}
 							lfc.setOut(outList);
-							// ��ȡexception
+							// 获取exception
 							Exception exception = new Exception();
 							List<Element> exceptionElements = node.selectNodes("Terminals/Terminal");
 							for (int j = 0; j < exceptionElements.size(); j++) {
 								Element exceptionNode = exceptionElements.get(j);
 								Element exceptionCaption = (Element) exceptionNode.selectSingleNode("Desp");
 								Element exceptionName = (Element) exceptionNode.selectSingleNode("Name");
-								if (exceptionCaption.getTextTrim().equals("ʧ��")) {
-									// �ж�next�������
+								if (exceptionCaption.getTextTrim().equals("失败")) {
+									// 判断next所需代码
 									String nextString = null;
 									List<Element> Connections = node.selectNodes("SourceConnections/Connection");
 									for (int x = 0; x < Connections.size(); x++) {
@@ -582,26 +614,31 @@ public class GetXml {
 								}
 								lfc.setException(exception);
 							}
-							// ����lfcPath
+							// 设置lfcPath
 							if (type.getTextTrim().equals("7")) {
 								Element path = (Element) node.selectSingleNode("FilePath");
-								lfc.setLfcPath(path.getTextTrim().replace(".tcpt", ".lfc"));
+								if (path==null) {
+									lfc.setLfcPath("");
+								}else {
+									lfc.setLfcPath(path.getTextTrim().replace(".tcpt", ".lfc"));
+								}
+								
 							} else if (type.getTextTrim().equals("12")) {
 
 							}
-							// ����fileDescription
+							// 设置fileDescription
 							FileDescription fileDescriptionLfc = new FileDescription();
 							fileDescriptionLfc.setAuthor("");
 							fileDescriptionLfc.setFunction("");
 							fileDescriptionLfc.setRemark("");
 							lfc.setFileDescription(fileDescriptionLfc);
-							// ����mappings
+							// 设置mappings
 							List<String> mappings = new ArrayList<String>();
 							lfc.setMappings(mappings);
-							// ����mappingPath
+							// 设置mappingPath
 							String mappingPath = null;
 							lfc.setMappingPath(mappingPath);
-							// ����ades
+							// 设置ades
 							List<Ade> adesLfc = new ArrayList<Ade>();
 							Ade adeLfc = new Ade();
 							adesLfc.add(adeLfc);
@@ -614,10 +651,9 @@ public class GetXml {
 		}
 		jsonRootBean.setLfc(lfcs);
 
-		// ����csd
+		// 设置csd
 		List<Csd> csds = new ArrayList<Csd>();
 		Csd csd = new Csd();
-		csds.add(csd);
 		jsonRootBean.setCsd(csds);
 		return jsonRootBean;
 	}

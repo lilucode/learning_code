@@ -1,7 +1,7 @@
 package com.tojson.realize;
 
 import com.tojson.realize.FolderRealize;
-//使用线程逐个执行
+//浣跨敤绾跨▼閫愪釜鎵ц
 public class FolderThread implements Runnable {
 	private String sourseFolder;
 	private String targetFolder;
@@ -19,9 +19,5 @@ public class FolderThread implements Runnable {
 		for (int i = 0; i < length; i++) {
 			tRealizeClass.Xml2Json(sourseFolder, targetFolder, i);
 		}
-	}
-	
-	public static void main(String[] args) {
-		
 	}
 }

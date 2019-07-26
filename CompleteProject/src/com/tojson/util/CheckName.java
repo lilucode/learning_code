@@ -7,6 +7,8 @@ public class CheckName {
 			finalFile = target.replace(".xml", ".json");
 		}else if (target.contains(".lfc") ){
 			finalFile = target.replace(".lfc", ".json");
+		}else if (target.contains(".bcpt") ){
+			finalFile = target.replace(".bcpt", ".json");
 		}
 		return finalFile;
 	}

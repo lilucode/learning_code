@@ -1,16 +1,20 @@
 package com.tojson.pojo;
 import java.util.List;
+
+import com.alibaba.fastjson.annotation.JSONField;
 public class OutArgs {
-    private List<Arg> arg; 
-    public void setArg(List<Arg> arg) {
-		this.arg = arg;
-	} 
-	public List<Arg> getArg() {
-		return arg;
+	@JSONField(name = "arg")
+	private List<Arg> args;
+	
+	public List<Arg> getArgs() {
+		return args;
+	}
+	public void setArgs(List<Arg> args) {
+		this.args = args;
 	}
 	@Override
 	public String toString() {
-		return "OutArgs [arg=" + arg + "]";
+		return "OutArgs [args=" + args + "]";
 	}
 	
 }

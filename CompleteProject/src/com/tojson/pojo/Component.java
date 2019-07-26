@@ -3,14 +3,23 @@ import java.util.List;
 
 import com.alibaba.fastjson.annotation.JSONField;
 public class Component {
+	@JSONField(ordinal = 1)
     private String id;
+	@JSONField(ordinal = 2)
     private String caption;
+	@JSONField(ordinal = 3)
     private String name;
+	@JSONField(ordinal = 4)
     private String showId;
+	@JSONField(ordinal = 5)
     private Geometry geometry;
+	@JSONField(ordinal = 6)
     private InArgs inArgs;
+	@JSONField(ordinal = 7)
     private OutArgs outArgs;
+	@JSONField(ordinal = 8)
     private List<Out> out;
+	@JSONField(ordinal = 9)
     private Exception exception;
     public void setId(String id) {
          this.id = id;
