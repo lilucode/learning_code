@@ -4,3 +4,6 @@ Bundle-Name: File
 Bundle-SymbolicName: cn.com.lilu.file
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Require-Bundle: javax.servlet;bundle-version="3.1.0",
+ org.apache.commons.logging,
+ org.apache.commons.uploadfile;bundle-version="1.0.0"
