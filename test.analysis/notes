@@ -1,7 +1,0 @@
-1.遍历整个目录下不同文件夹类的bcpt文件，生成对应目录的lfc文件
-
-2.多个正常出口：AccessRulesCheck
-
-3..bcpt转换为bcMode等对象，再转换到lfc对象，把逻辑分别放入get方法中。
-
-4.next节点是特殊id

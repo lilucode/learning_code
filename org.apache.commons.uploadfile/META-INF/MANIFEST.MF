@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Uploadfile
+Bundle-SymbolicName: org.apache.commons.uploadfile
+Bundle-Version: 1.0.0
+Bundle-ClassPath: commons-fileupload-1.3.2.jar
+Export-Package: org.apache.commons.fileupload,
+ org.apache.commons.fileupload.disk,
+ org.apache.commons.fileupload.portlet,
+ org.apache.commons.fileupload.servlet,
+ org.apache.commons.fileupload.util,
+ org.apache.commons.fileupload.util.mime
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Require-Bundle: javax.servlet;bundle-version="3.0.0",
+ org.apache.commons.io;bundle-version="1.0.0"
