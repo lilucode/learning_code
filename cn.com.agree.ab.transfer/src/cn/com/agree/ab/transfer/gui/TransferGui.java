@@ -21,7 +21,7 @@ public class TransferGui extends JFrame {
 	public static JTextField projectName = new JTextField(10); // 选择转换后的项目名称
 	public static JButton buttonBrowseSource = new JButton("浏览"); // 浏览按钮
 	public static JButton buttonTransfer = new JButton("生成.lfc文件"); 
-	public static String[] str = { "bcpt转换lfc", "fc转换lfc" };
+	public static String[] str = { "bcpt转换lfc", "fc转换lfc", "xml-lfc转换json-lfc" };
 	public static JComboBox combol = new JComboBox(str);
 
 	public TransferGui() {

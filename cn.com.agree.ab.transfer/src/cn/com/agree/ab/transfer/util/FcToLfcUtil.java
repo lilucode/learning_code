@@ -28,7 +28,7 @@ public class FcToLfcUtil extends LfcUtil{
 
 	public String fileName = "";
 
-	private List<String> allName = new ArrayList<String>();
+	private static List<String> allName = new ArrayList<String>();
 
 	public FcToLfcUtil(String fileName) {
 		this.fileName = fileName;
@@ -109,8 +109,9 @@ public class FcToLfcUtil extends LfcUtil{
 	}
 
 	public String checkName(String name) {
+		String temp = name;
 		for (int i = 1; i < Integer.MAX_VALUE && allName.contains(name); i++) {
-			name = name + '(' + i + ')';
+			name = temp + '(' + i + ')';
 		}
 		allName.add(name);
 		return name;

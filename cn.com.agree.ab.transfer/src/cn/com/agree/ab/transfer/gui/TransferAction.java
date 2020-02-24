@@ -7,6 +7,7 @@ import javax.swing.JOptionPane;
 
 import cn.com.agree.ab.transfer.main.BcptToLfcMain;
 import cn.com.agree.ab.transfer.main.FcToLfcMain;
+import cn.com.agree.ab.transfer.main.XmlToJsonMain;
 
 public class TransferAction implements ActionListener {
 	@Override
@@ -22,9 +23,12 @@ public class TransferAction implements ActionListener {
 			try {
 				if (select.equals("bcpt转换lfc")) {
 					BcptToLfcMain.main(new String[] { projectName, sourcePath });
-				} else {
+				} else if(select.equals("fc转换lfc")){
 					FcToLfcMain.main(new String[] { projectName, sourcePath});
+				}else {
+					XmlToJsonMain.main(new String[] { projectName, sourcePath});
 				}
+				JOptionPane.showMessageDialog(null, "转换完成！");
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}

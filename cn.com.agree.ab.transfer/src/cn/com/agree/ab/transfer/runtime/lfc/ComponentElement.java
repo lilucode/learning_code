@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * LFC文件中Component元素
  * 
  */
-public abstract class ComponentElement
+public class ComponentElement
 {
 	private String id;
 
@@ -32,6 +32,13 @@ public abstract class ComponentElement
     private List<ComponentOut> out = new ArrayList<ComponentOut>();
     
     private ComponentException exception = new ComponentException();
+    
+    public ComponentElement() {
+		// 参数里面包含"arg": []模块
+		List<ArgElement> list = new ArrayList<ArgElement>();
+		inArgs.put("arg", list);
+		outArgs.put("arg", list);
+    }
     
     public String getId()
     {

@@ -41,6 +41,19 @@ public class LogicFlowControl // implements IDncContainer
 
 	private List<ComponentElement> component = new ArrayList<ComponentElement>();
 
+
+	public LogicFlowControl() {
+
+		// 参数里面包含"arg": []模块
+		List<ArgElement> list = new ArrayList<ArgElement>();
+		inArgs.put("arg", list);
+		outArgs.put("arg", list);
+		fileDescription.setAuthor("");
+		fileDescription.setFunction("");
+		fileDescription.setRemark("");
+		
+	}
+	
 	public int getStart() {
 		return start;
 	}
@@ -159,7 +172,5 @@ public class LogicFlowControl // implements IDncContainer
 		this.component.add(component);
 	}
 
-	public LogicFlowControl() {
-	}
 
 }
