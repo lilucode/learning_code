@@ -1,7 +1,9 @@
 package cn.com.agree.ab.transfer.afa.parser;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -47,10 +49,25 @@ public class LfcXmlParser extends AbstractParser<LogicFlowControl> {
 		Endstep endstep = new Endstep();
 		endstep.setId(endStepElement.getAttribute("id"));
 		endstep.setGeometry(getGeometry(endStepElement));
+		List<Element> inElement = getDirectChildElements(endStepElement, "In");
+		endstep.setIn(new ArrayList<Map<String, String>>());
+		for (Element element : inElement) {
+			Map<String, String> map = new HashMap<String, String>();
+			map.put("id", element.getAttribute("id"));
+			map.put("caption", element.getAttribute("caption"));
+			map.put("name", element.getAttribute("name"));
+			endstep.getIn().add(map);
+		}
 		lfc.setEndstep(endstep);
-		//<End
-		Element endElement = getDirectChildElement(lfcElement, "End");
-		lfc.setEnd(endElement.getAttribute("id"));
+		// <End 结束组件的出口可能有多个
+		List<Element> endElement = getDirectChildElements(lfcElement, "End");
+		for (Element element : endElement) {
+			Map<String, String> map = new HashMap<String, String>();
+			map.put("id", element.getAttribute("id"));
+			map.put("caption", element.getAttribute("caption"));
+			map.put("name", element.getAttribute("name"));
+			lfc.setEnd(map);
+		}
 		// <Component
 		List<Element> componentElement = getDirectChildElements(lfcElement, "Component");
 		for (Element componentXml : componentElement) {

@@ -57,6 +57,7 @@ public class CsdXmlParser extends AbstractParser<CloudServiceDefinition> {
 			}
 			Constant.XmList.add(body);
 		}
+		csd.setRequest(request);
 
 		//<Response
 		Element responseElement = getDirectChildElement(csdElement, "Response");
@@ -93,6 +94,7 @@ public class CsdXmlParser extends AbstractParser<CloudServiceDefinition> {
 				Constant.RepeatLfcList.add(implement);
 			}
 		}
+		csd.setResponse(response);
 		return csd;
 	}
 }

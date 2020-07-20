@@ -288,12 +288,12 @@ public class GitReporter
 	public static void runMaster4_1() throws Exception
 	{
 		// master
-		String abRepositoryDir = "E:\\git_me\\learning_code";
+		String abRepositoryDir = "E:\\git\\abc5.0\\master";
 //		String adoreRepositoryDir = "D:\\workspace\\ab4.0_bak\\adore";
 		
 		//第一个不打印
-		String abStart = "d1e6bf0f3a9038045137be88b130b2c3895abf75";
-		String abEnd = "c407bb86e2a57004dd2f99fa13ee8c948f04ea51";
+		String abStart = "0538d0e2adc11cda2cc8a900103ae086d9cf99f2";
+		String abEnd = "66e6e168cf985bdb75ef4b83801d6d8e265f4077";
 
 		/**
 		 * 往前面两个，第一个不打印，第二个插件不打印

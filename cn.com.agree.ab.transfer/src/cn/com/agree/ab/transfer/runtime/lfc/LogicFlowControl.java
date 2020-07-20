@@ -140,6 +140,12 @@ public class LogicFlowControl // implements IDncContainer
 		return end;
 	}
 
+	
+	
+	public void setEnd(Map<String, String> map) {
+		end.add(map);
+	}
+
 	public void setEnd(String id) {
 		Map<String, String> map = new ConcurrentHashMap<String, String>();
 		map.put("caption", "正常出口");

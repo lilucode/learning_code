@@ -1,0 +1,113 @@
+{
+	"start":1,
+	"caption":"",
+	"geometry":{
+		"x":50,
+		"y":50,
+		"width":100,
+		"height":50
+	},
+	"fileDescription":{
+		"author":"",
+		"function":"",
+		"remark":""
+	},
+	"dataBasket":{
+		"ade":[
+			
+		]
+	},
+	"inArgs":{
+		"arg":[
+			
+		]
+	},
+	"outArgs":{
+		"arg":[
+			
+		]
+	},
+	"internalVars":{
+		"arg":[
+			
+		]
+	},
+	"endstep":{
+		"geometry":{
+			"x":200,
+			"y":500,
+			"width":100,
+			"height":50
+		},
+		"id":"1000",
+		"in":[
+			{
+				"name":"正常出口",
+				"caption":"正常出口",
+				"id":"1001"
+			}
+		]
+	},
+	"end":[
+		{
+			"name":"正常出口",
+			"caption":"正常出口",
+			"id":"1001"
+		}
+	],
+	"lfc":[
+		{
+			"ades":[
+				
+			],
+			"caption":"服务接入",
+			"exception":{
+				"name":"",
+				"next":""
+			},
+			"fileDescription":{
+				"author":"",
+				"function":"",
+				"remark":""
+			},
+			"geometry":{
+				"x":115,
+				"y":198,
+				"width":160,
+				"height":46
+			},
+			"id":"1",
+			"inArgs":{
+				"arg":[
+					
+				]
+			},
+			"lfcPath":"/demo-s/business/GateWay/服务接入.lfc",
+			"mappingPath":"",
+			"mappings":[
+				
+			],
+			"name":"服务接入",
+			"out":[
+				{
+					"caption":"正常出口",
+					"id":"",
+					"name":"正常出口",
+					"next":"1001"
+				}
+			],
+			"outArgs":{
+				"arg":[
+					
+				]
+			},
+			"showId":"1"
+		}
+	],
+	"csd":[
+		
+	],
+	"component":[
+		
+	]
+}
